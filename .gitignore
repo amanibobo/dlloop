@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+
+# Virtual environments
+.venv
+
+# Secrets (API keys); see README for the variables
+.env
+
+# Generated datasets, checkpoints, reports (DESIGN.md Section 12)
+data/
+reports/
+checkpoints/
