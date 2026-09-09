@@ -10,6 +10,7 @@ from lenscraft.compute.backend import ComputeBackend
 @dataclass
 class AgentDeps:
     backend: ComputeBackend
-    wait_timeout: float | None = None  # seconds to wait for a remote batch; None = until done
+    wait_timeout: float | None = None  # seconds to wait for a remote job; None = until done
     poll_seconds: float = 2.0
     run_ids: list[str] = field(default_factory=list)  # runs created during this session
+    model_ids: list[str] = field(default_factory=list)  # models trained during this session

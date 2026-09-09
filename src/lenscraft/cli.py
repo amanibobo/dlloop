@@ -1,8 +1,10 @@
 """Command-line entry points.
 
     lenscraft simulate  --substructure vortex --n 100 --seed 0 --run-id run001 [--backend modal]
+    lenscraft train     --kind classifier --arch resnet18 --model-id clf_a --runs r1 r2 r3 --epochs 10 [--backend modal]
+    lenscraft evaluate  --model-id clf_a --runs r4 [--backend modal]
     lenscraft agent     "make 200 vortex images and 200 with no substructure" [--backend modal] [--yes]
-    lenscraft runs      [--backend modal]
+    lenscraft runs / models  [--backend modal]
     lenscraft summarize run001 run002 [--backend modal]      (or local lensjsonl paths)
     lenscraft fetch     run001 --out data                     (copy a Modal run's records locally)
 """
@@ -14,7 +16,7 @@ import json
 import sys
 from pathlib import Path
 
-from lenscraft.schema import LensCard, read_records, summarize_records
+from lenscraft.schema import EvalSpec, LensCard, TrainSpec, read_records, summarize_records
 from lenscraft.schema.lensjsonl import dumps_summary, write_records
 
 
@@ -40,29 +42,58 @@ def _build_card(args: argparse.Namespace) -> LensCard:
     return LensCard.model_validate(data)
 
 
+def _print_and_exit(result) -> int:
+    print(result.model_dump_json(indent=2))
+    return 0 if result.status == "ok" else 1
+
+
 def cmd_simulate(args: argparse.Namespace) -> int:
     card = _build_card(args)
     print(f"LensCard:\n{card.model_dump_json(indent=2)}", file=sys.stderr)
     if args.backend == "local" and args.progress:
         from lenscraft.sim import simulate_lens_batch
 
-        result = simulate_lens_batch(card, args.data_dir, args.run_id, progress=True)
-    else:
-        backend = _backend(args)
-        job_id = backend.submit(card, args.run_id)
-        print(f"submitted {job_id} to {backend.name}", file=sys.stderr)
-        status = backend.wait(job_id)
-        if status.result is None:
-            print(json.dumps({"status": status.state, "error": status.error}, indent=2))
-            return 1
-        result = status.result
-    print(result.model_dump_json(indent=2))
-    return 0 if result.status == "ok" else 1
+        return _print_and_exit(simulate_lens_batch(card, args.data_dir, args.run_id, progress=True))
+    backend = _backend(args)
+    job_id = backend.submit(card, args.run_id)
+    print(f"submitted {job_id} to {backend.name}", file=sys.stderr)
+    status = backend.wait(job_id)
+    if status.result is None:
+        print(json.dumps({"status": status.state, "error": status.error}, indent=2))
+        return 1
+    return _print_and_exit(status.result)
+
+
+def cmd_train(args: argparse.Namespace) -> int:
+    spec = TrainSpec(
+        model_id=args.model_id, kind=args.kind, arch=args.arch, run_ids=args.runs, epochs=args.epochs,
+        batch_size=args.batch_size, learning_rate=args.lr, input_size=args.input_size, seed=args.seed, max_images=args.max_images,
+    )
+    print(f"TrainSpec:\n{spec.model_dump_json(indent=2)}", file=sys.stderr)
+    backend = _backend(args)
+    job_id = backend.submit_train(spec)
+    print(f"submitted {job_id} to {backend.name}", file=sys.stderr)
+    status = backend.wait(job_id)
+    if status.result is None:
+        print(json.dumps({"status": status.state, "error": status.error}, indent=2))
+        return 1
+    return _print_and_exit(status.result)
+
+
+def cmd_evaluate(args: argparse.Namespace) -> int:
+    spec = EvalSpec(model_id=args.model_id, run_ids=args.runs, max_images=args.max_images)
+    return _print_and_exit(_backend(args).evaluate(spec))
 
 
 def cmd_runs(args: argparse.Namespace) -> int:
     for run_id in _backend(args).list_runs():
         print(run_id)
+    return 0
+
+
+def cmd_models(args: argparse.Namespace) -> int:
+    for model_id in _backend(args).list_models():
+        print(model_id)
     return 0
 
 
@@ -101,6 +132,8 @@ def cmd_agent(args: argparse.Namespace) -> int:
     print(result.output)
     if deps.run_ids:
         print(f"\nruns created: {', '.join(deps.run_ids)}", file=sys.stderr)
+    if deps.model_ids:
+        print(f"models trained: {', '.join(deps.model_ids)}", file=sys.stderr)
     return 0
 
 
@@ -125,8 +158,30 @@ def build_parser() -> argparse.ArgumentParser:
     sim.add_argument("--progress", action="store_true", help="per-image progress (local backend only)")
     sim.set_defaults(func=cmd_simulate)
 
+    tr = sub.add_parser("train", parents=[common], help="train a classifier or anomaly detector on existing runs")
+    tr.add_argument("--model-id", required=True, dest="model_id")
+    tr.add_argument("--kind", choices=["classifier", "anomaly"], required=True)
+    tr.add_argument("--arch", required=True, help="resnet18|alexnet or dcae|vae|aae")
+    tr.add_argument("--runs", nargs="+", required=True)
+    tr.add_argument("--epochs", type=int, default=10)
+    tr.add_argument("--batch-size", type=int, default=64, dest="batch_size")
+    tr.add_argument("--lr", type=float, default=1e-3)
+    tr.add_argument("--input-size", type=int, default=150, dest="input_size")
+    tr.add_argument("--seed", type=int, default=0)
+    tr.add_argument("--max-images", type=int, dest="max_images")
+    tr.set_defaults(func=cmd_train)
+
+    ev = sub.add_parser("evaluate", parents=[common], help="evaluate a trained model on runs")
+    ev.add_argument("--model-id", required=True, dest="model_id")
+    ev.add_argument("--runs", nargs="+", required=True)
+    ev.add_argument("--max-images", type=int, dest="max_images")
+    ev.set_defaults(func=cmd_evaluate)
+
     runs = sub.add_parser("runs", parents=[common], help="list existing runs")
     runs.set_defaults(func=cmd_runs)
+
+    models = sub.add_parser("models", parents=[common], help="list trained models")
+    models.set_defaults(func=cmd_models)
 
     summ = sub.add_parser("summarize", parents=[common], help="composition summary of runs (ids on the backend, or lensjsonl paths)")
     summ.add_argument("items", nargs="+")
@@ -137,10 +192,10 @@ def build_parser() -> argparse.ArgumentParser:
     fetch.add_argument("--out", default="data")
     fetch.set_defaults(func=cmd_fetch)
 
-    ag = sub.add_parser("agent", parents=[common], help="natural-language request -> proposed LensCard -> your approval -> run")
+    ag = sub.add_parser("agent", parents=[common], help="natural-language request -> proposed tool calls -> your approval -> run")
     ag.add_argument("prompt")
     ag.add_argument("--model", help="Pydantic AI model string (default: $LENSCRAFT_MODEL or anthropic:claude-opus-5)")
-    ag.add_argument("--yes", action="store_true", help="auto-approve every proposed batch (scripts/benchmarks)")
+    ag.add_argument("--yes", action="store_true", help="auto-approve every proposed batch/training job (scripts/benchmarks)")
     ag.add_argument("--core-only", action="store_true", dest="core_only", help="benchmark baseline: no domain tools")
     ag.set_defaults(func=cmd_agent)
     return parser

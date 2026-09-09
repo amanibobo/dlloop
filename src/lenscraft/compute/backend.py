@@ -1,8 +1,9 @@
 """Compute backends behind one ``submit()/status()`` interface (DESIGN.md Section 10).
 
-- :class:`LocalBackend` runs simulations in-process and stores runs under a local ``data/`` dir.
+- :class:`LocalBackend` runs simulations and training in-process; runs live under ``<data_dir>``
+  and models under ``<data_dir>/_models``.
 - :class:`ModalBackend` submits to the deployed Modal app (``lenscraft.compute.modal_app``);
-  images and records live on the ``lenscraft-data`` Modal Volume and never touch the laptop.
+  images, records and checkpoints live on the ``lenscraft-data`` Volume and never touch the laptop.
 
 The agent's tools only ever talk to :class:`ComputeBackend`, so swapping backends is a CLI flag.
 """
@@ -18,8 +19,10 @@ from pydantic import BaseModel, ConfigDict
 
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
 from lenscraft.schema.lensjsonl import LensRecord, read_records
+from lenscraft.schema.ml import EvalResult, EvalSpec, TrainResult, TrainSpec
 
 JobState = Literal["queued", "running", "done", "failed"]
+MODELS_DIRNAME = "_models"
 
 
 class JobStatus(BaseModel):
@@ -27,7 +30,7 @@ class JobStatus(BaseModel):
 
     job_id: str
     state: JobState
-    result: SimBatchResult | None = None
+    result: SimBatchResult | TrainResult | None = None
     error: str = ""
 
     @property
@@ -42,11 +45,18 @@ class ComputeBackend(Protocol):
     def submit(self, card: LensCard, run_id: str) -> str:
         """Start a simulation batch; returns a job id."""
 
+    def submit_train(self, spec: TrainSpec) -> str:
+        """Start a training job; returns a job id."""
+
     def status(self, job_id: str) -> JobStatus: ...
 
     def wait(self, job_id: str, *, poll_seconds: float = 2.0, timeout: float | None = None) -> JobStatus: ...
 
+    def evaluate(self, spec: EvalSpec) -> EvalResult: ...
+
     def list_runs(self) -> list[str]: ...
+
+    def list_models(self) -> list[str]: ...
 
     def read_records(self, run_id: str) -> list[LensRecord]: ...
 
@@ -62,31 +72,37 @@ def _wait(backend: ComputeBackend, job_id: str, poll_seconds: float, timeout: fl
         time.sleep(poll_seconds)
 
 
+def _status_from_result(job_id: str, result: SimBatchResult | TrainResult) -> JobStatus:
+    return JobStatus(job_id=job_id, state="done" if result.status == "ok" else "failed", result=result, error=result.message)
+
+
 # ------------------------------------------------------------------------------------------
 # Local
 # ------------------------------------------------------------------------------------------
 
 
 class LocalBackend:
-    """Runs synchronously in-process. ``submit`` returns only once the batch is finished."""
+    """Runs synchronously in-process. ``submit*`` return only once the job is finished."""
 
     name = "local"
 
     def __init__(self, data_dir: str | Path = "data") -> None:
         self.data_dir = Path(data_dir)
+        self.models_dir = self.data_dir / MODELS_DIRNAME
         self._jobs: dict[str, JobStatus] = {}
 
     def submit(self, card: LensCard, run_id: str) -> str:
         from lenscraft.sim.batch import simulate_lens_batch
 
         job_id = f"local-{len(self._jobs) + 1}-{run_id}"
-        result = simulate_lens_batch(card, self.data_dir, run_id)
-        self._jobs[job_id] = JobStatus(
-            job_id=job_id,
-            state="done" if result.status == "ok" else "failed",
-            result=result,
-            error=result.message,
-        )
+        self._jobs[job_id] = _status_from_result(job_id, simulate_lens_batch(card, self.data_dir, run_id))
+        return job_id
+
+    def submit_train(self, spec: TrainSpec) -> str:
+        from lenscraft.ml.train import train_model  # needs torch
+
+        job_id = f"local-{len(self._jobs) + 1}-{spec.model_id}"
+        self._jobs[job_id] = _status_from_result(job_id, train_model(spec, self.data_dir, self.models_dir))
         return job_id
 
     def status(self, job_id: str) -> JobStatus:
@@ -98,10 +114,20 @@ class LocalBackend:
     def wait(self, job_id: str, *, poll_seconds: float = 2.0, timeout: float | None = None) -> JobStatus:
         return _wait(self, job_id, poll_seconds, timeout)
 
+    def evaluate(self, spec: EvalSpec) -> EvalResult:
+        from lenscraft.ml.train import evaluate_model  # needs torch
+
+        return evaluate_model(spec, self.data_dir, self.models_dir)
+
     def list_runs(self) -> list[str]:
         if not self.data_dir.exists():
             return []
         return sorted(p.name for p in self.data_dir.iterdir() if (p / "records.lensjsonl").exists())
+
+    def list_models(self) -> list[str]:
+        if not self.models_dir.exists():
+            return []
+        return sorted(p.name for p in self.models_dir.iterdir() if (p / "model.pt").exists())
 
     def read_records(self, run_id: str) -> list[LensRecord]:
         path = self.data_dir / run_id / "records.lensjsonl"
@@ -134,6 +160,7 @@ class ModalBackend:
         self.app_name = app_name
         self._functions: dict[str, Any] = dict(functions or {})
         self._call_from_id = call_from_id
+        self._job_kind: dict[str, str] = {}
 
     def _fn(self, name: str) -> Any:
         if name not in self._functions:
@@ -151,6 +178,12 @@ class ModalBackend:
 
     def submit(self, card: LensCard, run_id: str) -> str:
         call = self._fn("simulate_batch").spawn(card.model_dump_json(), run_id)
+        self._job_kind[str(call.object_id)] = "sim"
+        return str(call.object_id)
+
+    def submit_train(self, spec: TrainSpec) -> str:
+        call = self._fn("train_model").spawn(spec.model_dump_json())
+        self._job_kind[str(call.object_id)] = "train"
         return str(call.object_id)
 
     def status(self, job_id: str) -> JobStatus:
@@ -161,19 +194,21 @@ class ModalBackend:
             return JobStatus(job_id=job_id, state="running")
         except Exception as exc:  # noqa: BLE001 - remote exception or expired call
             return JobStatus(job_id=job_id, state="failed", error=f"{type(exc).__name__}: {exc}")
-        result = SimBatchResult.model_validate(payload)
-        return JobStatus(
-            job_id=job_id,
-            state="done" if result.status == "ok" else "failed",
-            result=result,
-            error=result.message,
-        )
+        kind = self._job_kind.get(job_id) or ("train" if "model_id" in payload else "sim")
+        result = TrainResult.model_validate(payload) if kind == "train" else SimBatchResult.model_validate(payload)
+        return _status_from_result(job_id, result)
 
     def wait(self, job_id: str, *, poll_seconds: float = 2.0, timeout: float | None = None) -> JobStatus:
         return _wait(self, job_id, poll_seconds, timeout)
 
+    def evaluate(self, spec: EvalSpec) -> EvalResult:
+        return EvalResult.model_validate(self._fn("evaluate_model").remote(spec.model_dump_json()))
+
     def list_runs(self) -> list[str]:
         return list(self._fn("list_runs").remote())
+
+    def list_models(self) -> list[str]:
+        return list(self._fn("list_models").remote())
 
     def read_records(self, run_id: str) -> list[LensRecord]:
         text: str = self._fn("read_run").remote(run_id)

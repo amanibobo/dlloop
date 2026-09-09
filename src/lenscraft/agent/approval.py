@@ -1,7 +1,8 @@
-"""The human checkpoint: drive an agent run, pausing whenever it proposes a simulation batch.
+"""The human checkpoint: drive an agent run, pausing whenever it proposes an expensive step.
 
 ``run_with_approval`` is framework-thin and fully testable: give it any callable that turns a
-proposed (LensCard, run_id) into ``ToolApproved`` (optionally with edits) or ``ToolDenied``.
+proposed tool call ``(tool_name, args)`` into ``ToolApproved`` (optionally with edited args) or
+``ToolDenied``. Gated tools are simulation batches and training jobs (see ``tools.APPROVAL_GATED``).
 """
 
 from __future__ import annotations
@@ -16,15 +17,18 @@ from pydantic_ai import Agent, DeferredToolRequests, DeferredToolResults, ToolAp
 from pydantic_ai.agent import AgentRunResult
 from pydantic_ai.messages import ModelMessage
 
-from lenscraft.agent.config import AgentDeps
+from lenscraft.agent.deps import AgentDeps
 from lenscraft.schema.lens_card import LensCard
 
 Decision = ToolApproved | ToolDenied
-Approver = Callable[[LensCard, str], Decision]
+Approver = Callable[[str, dict[str, Any]], Decision]
 
 
-def _proposal(args: dict[str, Any]) -> tuple[LensCard, str]:
-    return LensCard.model_validate(args.get("card", {})), str(args.get("run_id", ""))
+def _validate_args(tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
+    """Normalise proposed args so the human sees a validated object (raises ValidationError)."""
+    if tool_name == "simulate_lens_batch":
+        return {**args, "card": LensCard.model_validate(args.get("card", {})).model_dump()}
+    return args
 
 
 def run_with_approval(
@@ -34,7 +38,7 @@ def run_with_approval(
     approve: Approver,
     *,
     message_history: Sequence[ModelMessage] | None = None,
-    max_rounds: int = 10,
+    max_rounds: int = 20,
 ) -> AgentRunResult[str | DeferredToolRequests]:
     """Run until the agent produces text, resolving every approval request through ``approve``."""
     result = agent.run_sync(prompt, deps=deps, message_history=message_history)
@@ -43,13 +47,12 @@ def run_with_approval(
             return result
         approvals: dict[str, Decision] = {}
         for call in result.output.approvals:
-            args = call.args_as_dict()
             try:
-                card, run_id = _proposal(args)
+                args = _validate_args(call.tool_name, call.args_as_dict())
             except ValidationError as exc:
-                approvals[call.tool_call_id] = ToolDenied(f"proposed card failed validation: {exc}")
+                approvals[call.tool_call_id] = ToolDenied(f"proposed arguments failed validation: {exc}")
                 continue
-            approvals[call.tool_call_id] = approve(card, run_id)
+            approvals[call.tool_call_id] = approve(call.tool_name, args)
         result = agent.run_sync(
             deferred_tool_results=DeferredToolResults(approvals=approvals),
             message_history=result.all_messages(),
@@ -58,38 +61,59 @@ def run_with_approval(
     raise RuntimeError(f"agent still requesting approval after {max_rounds} rounds")
 
 
-def auto_approver(card: LensCard, run_id: str) -> Decision:
+def auto_approver(tool_name: str, args: dict[str, Any]) -> Decision:
     """Approve everything (scripts, benchmarks)."""
     return ToolApproved()
 
 
-def console_approver(card: LensCard, run_id: str, *, input_fn: Callable[[str], str] = input, out=sys.stderr) -> Decision:
-    """Interactive terminal approval: y / n / e (edit fields as key=value or a JSON patch)."""
+def console_approver(
+    tool_name: str,
+    args: dict[str, Any],
+    *,
+    input_fn: Callable[[str], str] = input,
+    out=sys.stderr,
+) -> Decision:
+    """Interactive terminal approval: y / n / e (edit fields as key=value pairs or a JSON patch).
+
+    Edits apply to top-level arguments, or to fields of the nested LensCard for simulation batches.
+    """
     while True:
-        print(f"\n=== Proposed simulation batch: run_id={run_id!r} ===", file=out)
-        print(card.model_dump_json(indent=2), file=out)
+        print(f"\n=== Proposed: {tool_name} ===", file=out)
+        print(json.dumps(args, indent=2), file=out)
         answer = input_fn("Approve? [y]es / [n]o / [e]dit: ").strip().lower()
         if answer in ("y", "yes"):
             return ToolApproved()
         if answer in ("n", "no"):
             reason = input_fn("Reason (shown to the agent): ").strip() or "denied by human"
-            return ToolDenied(f"human denied this batch: {reason}")
+            return ToolDenied(f"human denied {tool_name}: {reason}")
         if answer in ("e", "edit"):
             raw = input_fn("Edits as key=value pairs (space-separated) or a JSON object: ").strip()
             try:
-                patch = _parse_patch(raw)
-                new_run = str(patch.pop("run_id", run_id))
-                new_card = LensCard.model_validate({**card.model_dump(), **patch})
+                edited = _apply_patch(tool_name, args, _parse_patch(raw))
             except (ValueError, ValidationError) as exc:
                 print(f"invalid edit: {exc}", file=out)
                 continue
-            card = new_card
-            run_id = new_run
+            args = edited
             print("Edited. Review again:", file=out)
-            if input_fn("Approve edited card? [y]/n: ").strip().lower() in ("", "y", "yes"):
-                return ToolApproved(override_args={"card": card.model_dump(), "run_id": run_id})
+            if input_fn("Approve edited arguments? [y]/n: ").strip().lower() in ("", "y", "yes"):
+                return ToolApproved(override_args=args)
             continue
         print("please answer y, n or e", file=out)
+
+
+def _apply_patch(tool_name: str, args: dict[str, Any], patch: dict[str, Any]) -> dict[str, Any]:
+    new_args = dict(args)
+    card = dict(args.get("card", {})) if "card" in args else None
+    for k, v in patch.items():
+        if k in args:
+            new_args[k] = v
+        elif card is not None:
+            card[k] = v
+        else:
+            raise ValueError(f"unknown argument {k!r}; valid keys: {sorted(args)}")
+    if card is not None:
+        new_args["card"] = card
+    return _validate_args(tool_name, new_args)
 
 
 def _parse_patch(raw: str) -> dict[str, Any]:
@@ -101,7 +125,7 @@ def _parse_patch(raw: str) -> dict[str, Any]:
             raise ValueError(f"expected key=value, got {token!r}")
         k, v = token.split("=", 1)
         try:
-            patch[k] = json.loads(v)  # numbers, true/false/null, quoted strings
+            patch[k] = json.loads(v)  # numbers, true/false/null, quoted strings, lists
         except json.JSONDecodeError:
             patch[k] = v
     return patch

@@ -8,8 +8,8 @@ design. This README tracks what is actually built.
 | Phase | Scope | State |
 |---|---|---|
 | 1 | `LensCard`, `lensjsonl`, standalone `simulate_lens_batch` on Lenstronomy | **built** |
-| 2 | Pydantic AI agent with approval-gated simulation tool; local + Modal compute backends | **built** (Modal deploy needs your account, see below) |
-| 3 | ResNet-18/AlexNet classifier, DCAE/VAE/AAE anomaly detectors (on Modal GPUs) | not started |
+| 2 | Pydantic AI agent with approval-gated simulation tool; local + Modal compute backends | **built**, verified live (Kimi K3 on Fireworks; batches on Modal) |
+| 3 | ResNet-18/AlexNet classifier, DCAE/VAE/AAE anomaly detectors, `evaluate_model`; GPU training on Modal | **built** |
 | 4 | `sample_uncertainty` active-learning loop | not started |
 | 5 | PyAutoLens cross-backend validation (stretch) | not started |
 | 6 | pass@k benchmark harness + report generator | not started |
@@ -67,7 +67,18 @@ uv run lenscraft simulate --substructure vortex --n 100 --seed 0 --run-id run001
 uv run lenscraft runs --backend modal                    # list runs on the Volume
 uv run lenscraft summarize run001 --backend modal        # composition summary (what the agent reads)
 uv run lenscraft fetch run001 --backend modal --out data # copy records (not images) locally
+
+# ML tier (GPU on Modal; torch is never installed on the laptop by `uv sync`)
+uv run lenscraft train --backend modal --kind classifier --arch resnet18 --model-id clf_a \
+    --runs train_none train_sub train_vor --epochs 10
+uv run lenscraft train --backend modal --kind anomaly --arch aae --model-id aae_a \
+    --runs train_none train_vor --epochs 10          # trains on 'none' only; vortex held out for AUC
+uv run lenscraft evaluate --backend modal --model-id clf_a --runs test_none test_sub test_vor
+uv run lenscraft models --backend modal
 ```
+
+The agent exposes the same as tools: `train_classifier`, `train_anomaly_detector` (both
+approval-gated), `evaluate_model`, `list_models`.
 
 From Python:
 
@@ -92,6 +103,19 @@ approve / approve-with-edits / deny, and the run resumes with that decision. Den
 the model with the reason. The `--core-only` flag builds the same agent with no domain tools,
 which is the benchmark baseline arm from DESIGN.md §9. Tools talk only to a `ComputeBackend`,
 so `--backend local|modal` changes where work happens without touching agent code.
+
+## ML notes
+
+`lenscraft.models` ports the architectures verbatim: torchvision ResNet-18 / AlexNet with a
+single-channel stem and 3-class head (Alexander et al. 2019), and the DCAE / VAE / AAE encoder,
+shared decoder and discriminator from Alexander et al. 2021 Appendix B. The paper's autoencoders
+are specified at 150×150 (5184 conv features), so `TrainSpec.input_size` defaults to 150 and images
+are resized on load; the flattened size and decoder output paddings are derived from `input_size`
+rather than hard-coded so other sizes where the arithmetic closes (96, 204) also work. Anomaly
+detectors train on the `none` class only and score images by reconstruction MSE; any substructure
+images passed in are held out and used to report a separation AUC. Checkpoints live under
+`_models/<model_id>/` next to the runs (locally under `data/`, on the Volume under `/data`), and
+`evaluate_model` writes per-image scores there for the Phase 4 uncertainty loop.
 
 ## Simulation engine notes
 
