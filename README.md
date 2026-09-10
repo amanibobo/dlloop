@@ -149,6 +149,22 @@ Runs on the Volume: `tr5k_{none,sub,vor}` (5,000 each, seeds 100-102) and `te1k_
 | `clf_resnet_a` (ResNet-18) | 900 | ~3 min | 0.373 (collapses to "none") | 0.814 macro |
 | `aae_5k_v2` (AAE) | 4,000 none | 44 s | – | ~0.57 substructure-vs-none |
 
+**One active-learning round** (same recipe, seed 0, best-validation checkpoint, cosine LR).
+`sample_uncertainty` on `clf_base_b` flagged vortices with axion mass in [1e-24, 2.8e-24] eV
+(the longest vortex lines, 1.8-3") at 29% accuracy. The loop simulated 2,000 vortex images at
+1.7e-24 eV (`al_r1`) and retrained:
+
+| Model | Training data | Test acc | Test AUC | none / subhalo / vortex acc | Weak cell acc |
+|---|---|---|---|---|---|
+| `clf_base_b` | 15,000 | 0.928 | 0.979 | 1.00 / 0.96 / 0.82 | 0.29 |
+| `clf_al_b` | 15,000 + 2,000 targeted | 0.900 | 0.980 | 1.00 / 0.79 / 0.91 | 0.62 |
+
+The targeted batch doubled accuracy in the weak region and lifted vortex accuracy overall, at
+the cost of subhalo accuracy (the added light-axion vortices are the ones that look most like
+subhalos, and the classes are now unbalanced). A second round would flag subhalos as the
+weakest class and propose the balancing batch. That is the loop working as intended; whether it
+converges to a better model than uniform sampling of the same budget is the Phase 6 benchmark.
+
 The classifier matches the ballpark of Alexander et al. 2019. The AAE is far from the 2021 paper's
 0.93: at this mass fraction and resolution the substructure perturbs the arcs by ~1% of the peak,
 and 10 epochs is a small fraction of what the paper trained for. Longer training, larger mass
