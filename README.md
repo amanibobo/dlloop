@@ -117,6 +117,23 @@ images passed in are held out and used to report a separation AUC. Checkpoints l
 `_models/<model_id>/` next to the runs (locally under `data/`, on the Volume under `/data`), and
 `evaluate_model` writes per-image scores there for the Phase 4 uncertainty loop.
 
+### Reference results (2026-09-09, Modal L4, Euclid 64 px, mass fraction 0.03, 10 epochs)
+
+Runs on the Volume: `tr5k_{none,sub,vor}` (5,000 each, seeds 100-102) and `te1k_{none,sub,vor}`
+(1,000 each, seeds 200-202). Evaluation is on the 3,000 held-out test images.
+
+| Model | Train images | Wall time | Test accuracy | Test AUC |
+|---|---|---|---|---|
+| `clf_resnet_5k` (ResNet-18) | 15,000 | ~5 min | 0.919 (none 1.00 / subhalo 0.92 / vortex 0.84) | 0.977 macro |
+| `clf_resnet_a` (ResNet-18) | 900 | ~3 min | 0.373 (collapses to "none") | 0.814 macro |
+| `aae_5k_v2` (AAE) | 4,000 none | 44 s | – | ~0.57 substructure-vs-none |
+
+The classifier matches the ballpark of Alexander et al. 2019. The AAE is far from the 2021 paper's
+0.93: at this mass fraction and resolution the substructure perturbs the arcs by ~1% of the peak,
+and 10 epochs is a small fraction of what the paper trained for. Longer training, larger mass
+fractions, and the 150 px `custom` instrument are the obvious levers, and are exactly what the
+Phase 4 uncertainty loop is meant to explore.
+
 ## Simulation engine notes
 
 `lenscraft.sim.lenstronomy_backend` is a port of
