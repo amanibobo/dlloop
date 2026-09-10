@@ -153,6 +153,16 @@ def read_file(path: str) -> str:
     return p.read_text(encoding="utf-8")
 
 
+@app.function(image=sim_image, volumes={DATA_DIR: volume})
+def read_npy(path: str) -> bytes:
+    """Read one .npy image from the Volume as raw bytes (for report figures)."""
+    volume.reload()
+    p = Path(DATA_DIR) / path
+    if not p.exists():
+        raise FileNotFoundError(f"no file {path!r} on volume {VOLUME_NAME}")
+    return p.read_bytes()
+
+
 @app.local_entrypoint()
 def main(substructure: str = "none", n: int = 10, seed: int = 0, run_id: str = "smoke") -> None:
     from lenscraft.schema import LensCard

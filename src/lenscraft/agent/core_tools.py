@@ -22,13 +22,13 @@ MAX_OUTPUT = 8000
 def _workspace(ctx: RunContext[AgentDeps]) -> Path:
     if ctx.deps.workspace is None:
         raise ModelRetry("no workspace configured for shell/file tools")
-    return Path(ctx.deps.workspace)
+    return Path(ctx.deps.workspace).resolve()  # resolved: macOS tmp dirs live behind a /private symlink
 
 
 def _resolve(ctx: RunContext[AgentDeps], path: str) -> Path:
     ws = _workspace(ctx)
     p = (ws / path).resolve() if not Path(path).is_absolute() else Path(path).resolve()
-    if ws.resolve() not in p.parents and p != ws.resolve():
+    if ws not in p.parents and p != ws:
         raise ModelRetry(f"path {path!r} is outside the workspace {ws}")
     return p
 

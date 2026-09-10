@@ -9,6 +9,7 @@ Approval-gated (cost money or GPU time): ``simulate_lens_batch``, ``train_classi
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from typing import Any, Literal, Optional
 
 from pydantic_ai import FunctionToolset, ModelRetry, RunContext
@@ -207,16 +208,46 @@ def sample_uncertainty(
 
 
 # --------------------------------------------------------------------------------------------
+# Docs tier
+# --------------------------------------------------------------------------------------------
+
+
+def generate_report(
+    ctx: RunContext[AgentDeps],
+    run_ids: list[str],
+    model_ids: list[str] | None = None,
+    eval_runs: list[str] | None = None,
+    name: str = "report",
+    title: str = "LensCraft run report",
+) -> dict[str, Any]:
+    """Write a markdown report with figures: dataset composition and sample images, training
+    curves and held-out evaluation per model, and where each model is weakest.
+
+    Args:
+        run_ids: Runs to describe (see list_runs).
+        model_ids: Trained models to include (see list_models).
+        eval_runs: Held-out runs the models were (or will be) evaluated on.
+        name: Output directory name under reports/.
+        title: Report title.
+    """
+    from lenscraft.report import generate_report as _gen
+
+    _check_id(name, "name")
+    result = _gen(ctx.deps.backend, run_ids=run_ids, model_ids=model_ids or [], eval_runs=eval_runs or [], out_dir=Path("reports") / name, title=title)
+    return result.model_dump()
+
+
+# --------------------------------------------------------------------------------------------
 # Toolsets
 # --------------------------------------------------------------------------------------------
 
 
 def full_toolset() -> FunctionToolset[AgentDeps]:
-    """Simulation + ML tiers. Expensive tools are approval-gated."""
+    """Simulation + ML + docs tiers. Expensive tools are approval-gated."""
     ts: FunctionToolset[AgentDeps] = FunctionToolset()
     for fn in (simulate_lens_batch, train_classifier, train_anomaly_detector):
         ts.add_function(fn, requires_approval=True)
-    for fn in (summarize_dataset, evaluate_model, sample_uncertainty, list_runs, list_models):
+    for fn in (summarize_dataset, evaluate_model, sample_uncertainty, generate_report, list_runs, list_models):
         ts.add_function(fn)
     return ts
 

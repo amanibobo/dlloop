@@ -123,6 +123,36 @@ def cmd_bench(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_report(args: argparse.Namespace) -> int:
+    from lenscraft.report import generate_report, load_json
+
+    loop_hist = None
+    if args.loop_json:
+        text = Path(args.loop_json).read_text(encoding="utf-8")
+        loop_hist = [json.loads(m) for m in _split_json_objects(text)]
+    result = generate_report(
+        _backend(args), run_ids=args.runs, model_ids=args.models or [], eval_runs=args.eval_runs or [], out_dir=args.out,
+        title=args.title, loop_history=loop_hist, bench_summary=load_json(args.bench_summary) if args.bench_summary else None,
+    )
+    print(result.model_dump_json(indent=2))
+    return 0 if result.status == "ok" else 1
+
+
+def _split_json_objects(text: str) -> list[str]:
+    """Split concatenated pretty-printed JSON objects (as `lenscraft loop` prints them)."""
+    out, depth, start = [], 0, None
+    for i, ch in enumerate(text):
+        if ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0 and start is not None:
+                out.append(text[start : i + 1])
+    return out
+
+
 def cmd_runs(args: argparse.Namespace) -> int:
     for run_id in _backend(args).list_runs():
         print(run_id)
@@ -239,14 +269,24 @@ def build_parser() -> argparse.ArgumentParser:
     be.add_argument("--trials", type=int, default=10)
     be.add_argument("--arms", nargs="+", choices=["tool", "core"], default=["tool", "core"])
     be.add_argument("--model", help="Pydantic AI model string (default: $LENSCRAFT_MODEL)")
-    be.add_argument("--n-train", type=int, default=24, dest="n_train", help="training images per class")
-    be.add_argument("--n-test", type=int, default=8, dest="n_test", help="test images per class")
-    be.add_argument("--epochs", type=int, default=1)
-    be.add_argument("--auc-threshold", type=float, default=0.5, dest="auc_threshold")
+    be.add_argument("--n-train", type=int, default=48, dest="n_train", help="training images per class")
+    be.add_argument("--n-test", type=int, default=16, dest="n_test", help="test images per class")
+    be.add_argument("--epochs", type=int, default=3)
+    be.add_argument("--auc-threshold", type=float, default=0.55, dest="auc_threshold")
     be.add_argument("--request-limit", type=int, default=60, dest="request_limit", help="max approval rounds per trial")
     be.add_argument("--out", default="reports/bench")
     be.add_argument("--keep", action="store_true", help="keep trial workspaces for inspection")
     be.set_defaults(func=cmd_bench)
+
+    rp = sub.add_parser("report", parents=[common], help="markdown + figures report for runs, models, loop history and benchmark")
+    rp.add_argument("--runs", nargs="+", required=True)
+    rp.add_argument("--models", nargs="*")
+    rp.add_argument("--eval-runs", nargs="*", dest="eval_runs", help="held-out runs the models were evaluated on")
+    rp.add_argument("--loop-json", dest="loop_json", help="file with `lenscraft loop` output")
+    rp.add_argument("--bench-summary", dest="bench_summary", help="reports/bench/summary.json")
+    rp.add_argument("--title", default="LensCraft run report")
+    rp.add_argument("--out", default="reports/report")
+    rp.set_defaults(func=cmd_report)
 
     runs = sub.add_parser("runs", parents=[common], help="list existing runs")
     runs.set_defaults(func=cmd_runs)

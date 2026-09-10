@@ -12,14 +12,16 @@ class BenchTask(BaseModel):
 
     name: str = "three_class_classifier"
     classes: list[str] = Field(default_factory=lambda: ["none", "subhalo", "vortex"])
-    n_train_per_class: int = 24
-    n_test_per_class: int = 8
+    # Sized so a *correct* pipeline clears the AUC bar reliably on a laptop CPU (~1-2 min per
+    # trial): 1 epoch on 24 images/class gave AUC 0.42-0.55, i.e. the last stage measured luck.
+    n_train_per_class: int = 48
+    n_test_per_class: int = 16
     image_size: int = 32
     mass_fraction: float = 0.03
     arch: str = "resnet18"
-    epochs: int = 1
+    epochs: int = 3
     input_size: int = 96
-    auc_threshold: float = 0.5
+    auc_threshold: float = 0.55
     train_prefix: str = "train"
     test_prefix: str = "test"
     model_id: str = "clf"

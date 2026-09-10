@@ -16,6 +16,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Literal, Protocol, runtime_checkable
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
@@ -156,6 +157,10 @@ class LocalBackend:
             return None
         return json.loads(path.read_text(encoding="utf-8"))
 
+    def read_image(self, run_id: str, image_path: str) -> np.ndarray | None:
+        path = self.data_dir / run_id / image_path
+        return np.load(path) if path.exists() else None
+
 
 # ------------------------------------------------------------------------------------------
 # Modal
@@ -254,6 +259,17 @@ class ModalBackend:
                 return None
             raise
         return json.loads(text)
+
+    def read_image(self, run_id: str, image_path: str) -> np.ndarray | None:
+        import io
+
+        try:
+            data: bytes = self._fn("read_npy").remote(f"{run_id}/{image_path}")
+        except Exception as exc:  # noqa: BLE001
+            if "FileNotFound" in type(exc).__name__ or "no file" in str(exc):
+                return None
+            raise
+        return np.load(io.BytesIO(data))
 
 
 def get_backend(name: str, *, data_dir: str | Path = "data") -> ComputeBackend:
