@@ -114,7 +114,7 @@ def cmd_bench(args: argparse.Namespace) -> int:
     from lenscraft.bench.run_benchmark import format_summary, run_benchmark
     from lenscraft.bench.task import BenchTask
 
-    task = BenchTask(n_train_per_class=args.n_train, n_test_per_class=args.n_test, epochs=args.epochs, auc_threshold=args.auc_threshold)
+    task = BenchTask(n_train_per_class=args.n_train, n_test_per_class=args.n_test, epochs=args.epochs, mass_fraction=args.mass_fraction, auc_threshold=args.auc_threshold)
     _, summary = run_benchmark(
         arms=tuple(args.arms), trials=args.trials, task=task, model=args.model, out_dir=args.out,
         keep_workspaces=args.keep, request_limit=args.request_limit,
@@ -269,10 +269,11 @@ def build_parser() -> argparse.ArgumentParser:
     be.add_argument("--trials", type=int, default=10)
     be.add_argument("--arms", nargs="+", choices=["tool", "core"], default=["tool", "core"])
     be.add_argument("--model", help="Pydantic AI model string (default: $LENSCRAFT_MODEL)")
-    be.add_argument("--n-train", type=int, default=48, dest="n_train", help="training images per class")
+    be.add_argument("--n-train", type=int, default=32, dest="n_train", help="training images per class")
     be.add_argument("--n-test", type=int, default=16, dest="n_test", help="test images per class")
-    be.add_argument("--epochs", type=int, default=3)
-    be.add_argument("--auc-threshold", type=float, default=0.55, dest="auc_threshold")
+    be.add_argument("--epochs", type=int, default=2)
+    be.add_argument("--mass-fraction", type=float, default=0.1, dest="mass_fraction")
+    be.add_argument("--auc-threshold", type=float, default=None, dest="auc_threshold", help="optional minimum AUC for the last stage (default: none; the reported value must match the file)")
     be.add_argument("--request-limit", type=int, default=60, dest="request_limit", help="max approval rounds per trial")
     be.add_argument("--out", default="reports/bench")
     be.add_argument("--keep", action="store_true", help="keep trial workspaces for inspection")

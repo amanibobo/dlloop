@@ -53,15 +53,18 @@ def test_rubric_stages(tmp_path):
     train = [TASK.train_run(c) for c in TASK.classes]
     test = [TASK.test_run(c) for c in TASK.classes]
     _fake_model(tmp_path, train + [test[0]], 0.9, test)  # leaked a test run into training
-    assert grade_workspace(tmp_path, TASK).stages_passed == ["simulate", "label"]
-    _fake_model(tmp_path, train, 0.3, test)  # too low
-    r = grade_workspace(tmp_path, TASK)
-    assert r.stages_passed == ["simulate", "label", "train"] and r.auc == 0.3 and not r.passed
+    assert grade_workspace(tmp_path, TASK, "AUC 0.9").stages_passed == ["simulate", "label"]
     _fake_model(tmp_path, train, 0.9, train)  # evaluated on training data: does not count
-    assert grade_workspace(tmp_path, TASK).auc is None
-    _fake_model(tmp_path, train, 0.9, test)
-    r = grade_workspace(tmp_path, TASK)
-    assert r.passed and r.reach == 1.0 and r.auc == 0.9
+    assert grade_workspace(tmp_path, TASK, "AUC 0.9").auc is None
+    _fake_model(tmp_path, train, 0.912, test)
+    r = grade_workspace(tmp_path, TASK, "The model is done.")  # evaluated but not reported
+    assert r.stages_passed == ["simulate", "label", "train"] and r.auc == 0.912 and not r.passed
+    assert grade_workspace(tmp_path, TASK, "test AUC = 0.95").stages_passed == ["simulate", "label", "train"]  # wrong number
+    for text in ("macro AUC 0.91", "AUC: 0.912", "reached 91.2% AUC"):
+        r = grade_workspace(tmp_path, TASK, text)
+        assert r.passed and r.reach == 1.0, text
+    strict = TASK.model_copy(update={"auc_threshold": 0.95})
+    assert not grade_workspace(tmp_path, strict, "AUC 0.912").passed  # optional threshold still works
 
 
 def test_rubric_rejects_bad_labels_and_missing_images(tmp_path):
@@ -112,7 +115,9 @@ def _scripted_tool_arm_agent(model, core_only=False):
         if n_calls < len(plan):
             name, args = plan[n_calls]
             return ModelResponse(parts=[ToolCallPart(name, args, tool_call_id=f"c{n_calls}")])
-        return ModelResponse(parts=[TextPart("done: AUC reported")])
+        last = [p for p in messages[-1].parts if p.part_kind == "tool-return"][-1].content
+        auc = last.auc if hasattr(last, "auc") else last.get("auc")
+        return ModelResponse(parts=[TextPart(f"done: held-out macro AUC {auc:.3f}" if auc is not None else "done: AUC undefined")])
 
     return build_agent(FunctionModel(fn), core_only=core_only)
 
@@ -123,7 +128,7 @@ def test_trial_and_benchmark_with_scripted_agent(tmp_path):
     pytest.importorskip("lenstronomy")
     res = run_trial("tool", 1, TASK, workspace=tmp_path / "ws", agent_factory=_scripted_tool_arm_agent)
     assert not res.error, res.error
-    assert res.rubric.stages_passed[:3] == ["simulate", "label", "train"]
+    assert res.rubric.passed, res.rubric.notes  # a correct pipeline that reports its AUC passes every stage
     assert res.approvals == 7 and res.requests >= 8
 
     def lazy_agent(model, core_only=False):

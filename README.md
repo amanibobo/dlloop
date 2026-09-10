@@ -13,7 +13,7 @@ design. This README tracks what is actually built.
 | 4 | `sample_uncertainty` tool + `lenscraft loop` driver (uncertainty → approve → simulate → retrain → evaluate) | **built** |
 | 5 | PyAutoLens cross-backend validation (stretch) | not started |
 | 6a | pass@k benchmark harness: tool-assisted vs core-only (shell + files) arms, stagewise rubric | **built** |
-| 6b | report generator | not started |
+| 6b | report generator (`lenscraft report`, agent tool `generate_report`) | **built** |
 
 ## Setup
 
@@ -146,6 +146,19 @@ cumulative and weighted: simulate 0.25 → label 0.15 → train 0.35 (training r
 (evaluated on the held-out runs, above threshold). *Reach* is the summed weight of passed stages;
 pass@k and pass^k use the unbiased estimators. Results go to `reports/bench/results.jsonl` and
 `summary.json`.
+
+## Reports
+
+```sh
+uv run lenscraft report --backend modal --runs tr5k_none tr5k_sub tr5k_vor te1k_none te1k_sub te1k_vor al_r1 \
+    --models clf_base_b clf_al_b aae_5k_v2 --eval-runs te1k_none te1k_sub te1k_vor \
+    --loop-json loop.out --bench-summary reports/bench/summary.json --out reports/run_5k
+```
+
+Writes `report.md` plus PNG figures: dataset composition and a sample-image grid, per-model
+training curves, held-out confusion matrix or anomaly-score distributions, the uncertainty
+cells with the proposed next batch, the active-learning rounds table, and the benchmark's
+stagewise pass rates. The agent's `generate_report` tool produces the same under `reports/<name>`.
 
 ## ML notes
 

@@ -100,7 +100,7 @@ def run_trial(
     except Exception as exc:  # noqa: BLE001 - a crashed trial is a failed trial, not a crashed benchmark
         error = f"{type(exc).__name__}: {exc}\n{traceback.format_exc()[-1500:]}"
     duration = time.perf_counter() - t0
-    rubric = grade_workspace(data_dir, task)
+    rubric = grade_workspace(data_dir, task, final_text)
     model_name = getattr(getattr(agent, "model", None), "model_name", None) or str(model)
     return TrialResult(
         arm=arm, trial=trial, model=str(model_name), rubric=rubric, duration_seconds=duration,

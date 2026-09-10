@@ -8,6 +8,7 @@ the layout in its prompt). Stages are cumulative: a stage only counts if every e
 from __future__ import annotations
 
 import json
+import re
 from math import comb
 from pathlib import Path
 from typing import Any
@@ -22,8 +23,10 @@ STAGES: list[tuple[str, float]] = [
     ("simulate", 0.25),  # every requested run exists with enough readable images
     ("label", 0.15),  # records carry the right substructure label for their run
     ("train", 0.35),  # a model was trained, on training runs only
-    ("auc", 0.25),  # evaluated on the held-out runs with AUC >= threshold
+    ("auc", 0.25),  # evaluated on the held-out runs and the AUC *reported* by the agent matches the file
 ]
+AUC_REPORT_TOLERANCE = 0.011
+_NUMBER_RE = re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)(\s*%)?")
 
 
 class RubricResult(BaseModel):
@@ -72,7 +75,20 @@ def _check_run(run_dir: Path, expected_cls: str, n_min: int) -> tuple[bool, bool
     return True, labels == {expected_cls}, f"{len(recs)} records, labels {sorted(labels)}"
 
 
-def grade_workspace(data_dir: str | Path, task: BenchTask) -> RubricResult:
+def reported_numbers(text: str) -> list[float]:
+    """Numbers in the agent's final answer, with percentages mapped to fractions."""
+    out = []
+    for num, pct in _NUMBER_RE.findall(text or ""):
+        try:
+            v = float(num)
+        except ValueError:
+            continue
+        out.append(v / 100 if pct else v)
+    return out
+
+
+def grade_workspace(data_dir: str | Path, task: BenchTask, final_text: str = "") -> RubricResult:
+    """Grade a trial from its sandbox and (for the last stage) the agent's final answer."""
     data_dir = Path(data_dir)
     result = RubricResult()
     notes = result.notes
@@ -127,10 +143,13 @@ def grade_workspace(data_dir: str | Path, task: BenchTask) -> RubricResult:
     if best is None:
         notes["auc"] = "no evaluation on the held-out runs"
         return _finish(result, ["simulate", "label", "train"])
-    if best < task.auc_threshold:
-        notes["auc"] = f"auc {best:.3f} < {task.auc_threshold}"
+    if task.auc_threshold is not None and best < task.auc_threshold:
+        notes["auc"] = f"auc {best:.3f} < threshold {task.auc_threshold}"
         return _finish(result, ["simulate", "label", "train"])
-    notes["auc"] = f"auc {best:.3f}"
+    if not any(abs(v - best) <= AUC_REPORT_TOLERANCE for v in reported_numbers(final_text)):
+        notes["auc"] = f"auc {best:.3f} evaluated but not reported in the final answer"
+        return _finish(result, ["simulate", "label", "train"])
+    notes["auc"] = f"auc {best:.3f}, reported"
     return _finish(result, [s for s, _ in STAGES])
 
 

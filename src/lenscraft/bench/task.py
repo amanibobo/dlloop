@@ -12,16 +12,18 @@ class BenchTask(BaseModel):
 
     name: str = "three_class_classifier"
     classes: list[str] = Field(default_factory=lambda: ["none", "subhalo", "vortex"])
-    # Sized so a *correct* pipeline clears the AUC bar reliably on a laptop CPU (~1-2 min per
-    # trial): 1 epoch on 24 images/class gave AUC 0.42-0.55, i.e. the last stage measured luck.
-    n_train_per_class: int = 48
+    # Sized for ~1-2 min per trial on a laptop CPU. At this scale a ResNet-18 from scratch does
+    # not learn (AUC ~ chance whatever the mass fraction), so the last stage does not threshold
+    # the AUC by default: it checks that a held-out evaluation exists and that the agent's final
+    # answer reports that AUC (HEPTAPOD's "correct value reported" criterion).
+    n_train_per_class: int = 32
     n_test_per_class: int = 16
     image_size: int = 32
-    mass_fraction: float = 0.03
+    mass_fraction: float = 0.1
     arch: str = "resnet18"
-    epochs: int = 3
+    epochs: int = 2
     input_size: int = 96
-    auc_threshold: float = 0.55
+    auc_threshold: float | None = None
     train_prefix: str = "train"
     test_prefix: str = "test"
     model_id: str = "clf"
@@ -46,7 +48,7 @@ class BenchTask(BaseModel):
 
     def prompt(self, arm: str, workspace: Path | None = None) -> str:
         if arm == "tool":
-            return self.goal() + "Use the available tools for every step. Finish by stating the test AUC."
+            return self.goal() + "Use the available tools for every step. Finish by stating the held-out macro AUC as a decimal (e.g. 0.63)."
         ws = str(workspace) if workspace else "."
         return (
             self.goal()
@@ -56,5 +58,6 @@ class BenchTask(BaseModel):
             f"- {ws}/data/_models/{self.model_id}/train_result.json: {{\"status\": \"ok\", \"run_ids\": [training run ids]}}.\n"
             f"- {ws}/data/_models/{self.model_id}/eval_test.json: {{\"auc\": <float>, \"run_ids\": [test run ids]}}.\n"
             "Use lenstronomy for the simulation (SIE + SHEAR main lens, POINT_MASS subhalos, SERSIC_ELLIPSE source, "
-            "lenstronomy.SimulationAPI with the Euclid config) and torch/torchvision for the classifier. Finish by stating the test AUC."
+            "lenstronomy.SimulationAPI with the Euclid config) and torch/torchvision for the classifier. "
+            "Finish by stating the held-out macro AUC as a decimal (e.g. 0.63), the same value written to eval_test.json."
         )

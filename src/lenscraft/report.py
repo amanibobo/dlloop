@@ -98,15 +98,21 @@ def _dataset_section(backend: ComputeBackend, run_ids: list[str], out_dir: Path,
     # SNR and residual distributions per class: small multiples, one hue per class, legend + direct label
     fig, axes = plt.subplots(1, 2, figsize=(9, 3.2))
     for ax, key, label in ((axes[0], "snr", "SNR"), (axes[1], "residual_rms", "substructure residual (fraction of peak)")):
-        for cls in CLASS_NAMES:
+        # 'none' has residual 0 by construction; it would collapse the residual axis, so it is left off that panel
+        classes = [c for c in CLASS_NAMES if not (key == "residual_rms" and c == "none")]
+        pooled = [r.snr if key == "snr" else r.moment_stats.residual_rms for r in all_recs if r.substructure_type in classes]
+        if not pooled:
+            continue
+        bins = np.linspace(min(pooled), max(pooled) or 1.0, 31)  # shared bins so the classes are comparable
+        for cls in classes:
             vals = [r.snr if key == "snr" else r.moment_stats.residual_rms for r in all_recs if r.substructure_type == cls]
             if vals:
-                ax.hist(vals, bins=30, histtype="step", linewidth=2, color=CLASS_COLORS[cls], label=f"{cls} (n={len(vals)})")
+                ax.hist(vals, bins=bins, histtype="step", linewidth=2, color=CLASS_COLORS[cls], label=f"{cls} (n={len(vals)})")
         ax.set_xlabel(label)
         ax.set_ylabel("images")
+        ax.legend()
         _style(ax)
     axes[0].set_title("Dataset composition")
-    axes[0].legend()
     fig_name = _save(fig, out_dir, "dataset_distributions", figures)
 
     # sample images, one row per class, sqrt stretch
@@ -152,9 +158,6 @@ def _model_section(backend: ComputeBackend, model_id: str, eval_runs: list[str],
             ax.set_title(f"Training curves, {model_id}")
             ax.legend()
             _style(ax)
-            if any("val_acc" in h or "auc" in h for h in hist):
-                ax2 = fig.add_axes(ax.get_position())  # second panel drawn as a separate figure keeps one axis per chart
-                fig.delaxes(ax2)
             md.append(f"\n![training curves]({_save(fig, out_dir, f'train_{model_id}', figures)})\n")
             key = "val_acc" if "val_acc" in hist[-1] else ("auc" if "auc" in hist[-1] else None)
             if key:
