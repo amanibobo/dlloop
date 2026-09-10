@@ -128,7 +128,7 @@ def test_core_only_agent_has_no_domain_tools():
     assert result.output == "no-tools"
 
     result = build_agent(FunctionModel(fn)).run_sync("hi", deps=AgentDeps(backend=LocalBackend()))
-    assert result.output == "evaluate_model,list_models,list_runs,simulate_lens_batch,summarize_dataset,train_anomaly_detector,train_classifier"
+    assert result.output == "evaluate_model,list_models,list_runs,sample_uncertainty,simulate_lens_batch,summarize_dataset,train_anomaly_detector,train_classifier"
 
 
 def test_console_approver_paths():

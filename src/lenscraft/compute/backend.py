@@ -10,6 +10,7 @@ The agent's tools only ever talk to :class:`ComputeBackend`, so swapping backend
 
 from __future__ import annotations
 
+import json
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -19,10 +20,15 @@ from pydantic import BaseModel, ConfigDict
 
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
 from lenscraft.schema.lensjsonl import LensRecord, read_records
-from lenscraft.schema.ml import EvalResult, EvalSpec, TrainResult, TrainSpec
+from lenscraft.schema.ml import EvalResult, EvalSpec, TrainResult, TrainSpec, eval_scores_filename
 
 JobState = Literal["queued", "running", "done", "failed"]
 MODELS_DIRNAME = "_models"
+
+
+def eval_scores_relpath(model_id: str, run_ids: list[str]) -> str:
+    """Path of a scores file relative to the data root (same layout locally and on the Volume)."""
+    return f"{MODELS_DIRNAME}/{model_id}/{eval_scores_filename(run_ids)}"
 
 
 class JobStatus(BaseModel):
@@ -59,6 +65,9 @@ class ComputeBackend(Protocol):
     def list_models(self) -> list[str]: ...
 
     def read_records(self, run_id: str) -> list[LensRecord]: ...
+
+    def read_eval_scores(self, model_id: str, run_ids: list[str]) -> dict[str, Any] | None:
+        """Per-image scores written by ``evaluate`` for these runs, or None if not evaluated yet."""
 
 
 def _wait(backend: ComputeBackend, job_id: str, poll_seconds: float, timeout: float | None) -> JobStatus:
@@ -134,6 +143,18 @@ class LocalBackend:
         if not path.exists():
             raise FileNotFoundError(f"no run {run_id!r} under {self.data_dir}")
         return read_records(path)
+
+    def read_eval_scores(self, model_id: str, run_ids: list[str]) -> dict[str, Any] | None:
+        path = self.data_dir / eval_scores_relpath(model_id, run_ids)
+        if not path.exists():
+            return None
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def read_train_result(self, model_id: str) -> dict[str, Any] | None:
+        path = self.models_dir / model_id / "train_result.json"
+        if not path.exists():
+            return None
+        return json.loads(path.read_text(encoding="utf-8"))
 
 
 # ------------------------------------------------------------------------------------------
@@ -213,6 +234,26 @@ class ModalBackend:
     def read_records(self, run_id: str) -> list[LensRecord]:
         text: str = self._fn("read_run").remote(run_id)
         return [LensRecord.model_validate_json(line) for line in text.splitlines() if line.strip()]
+
+    def read_eval_scores(self, model_id: str, run_ids: list[str]) -> dict[str, Any] | None:
+        try:
+            text: str = self._fn("read_file").remote(eval_scores_relpath(model_id, run_ids))
+        except FileNotFoundError:
+            return None
+        except Exception as exc:  # noqa: BLE001 - Modal wraps remote exceptions
+            if "FileNotFound" in type(exc).__name__ or "no file" in str(exc):
+                return None
+            raise
+        return json.loads(text)
+
+    def read_train_result(self, model_id: str) -> dict[str, Any] | None:
+        try:
+            text: str = self._fn("read_file").remote(f"{MODELS_DIRNAME}/{model_id}/train_result.json")
+        except Exception as exc:  # noqa: BLE001
+            if "FileNotFound" in type(exc).__name__ or "no file" in str(exc):
+                return None
+            raise
+        return json.loads(text)
 
 
 def get_backend(name: str, *, data_dir: str | Path = "data") -> ComputeBackend:

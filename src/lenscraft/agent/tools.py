@@ -17,6 +17,7 @@ from lenscraft.agent.deps import AgentDeps
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
 from lenscraft.schema.lensjsonl import summarize_records
 from lenscraft.schema.ml import EvalResult, EvalSpec, TrainResult, TrainSpec
+from lenscraft.schema.uncertainty import UncertaintyReport
 
 ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_\-]{0,39}")
 
@@ -176,6 +177,35 @@ def list_models(ctx: RunContext[AgentDeps]) -> list[str]:
     return ctx.deps.backend.list_models()
 
 
+def sample_uncertainty(
+    ctx: RunContext[AgentDeps],
+    model_id: str,
+    run_ids: list[str],
+    n_images_proposed: int = 2000,
+    n_bins: int = 4,
+) -> UncertaintyReport:
+    """Find where in LensCard space a trained model is weakest and propose the next batch.
+
+    Joins the model's per-image scores on the given runs (evaluating first if needed) with the
+    simulation records, bins each substructure class by mass fraction, SNR, axion mass (vortex)
+    or subhalo count, and ranks the bins by mean uncertainty (classifier: 1 - P(true class);
+    anomaly: how ordinary the reconstruction error looks). Returns the weakest cells and a
+    suggested_card that adds images there; submit it with simulate_lens_batch (approval-gated),
+    then retrain including the new run and evaluate again on the same held-out runs.
+
+    Args:
+        model_id: A trained model (see list_models).
+        run_ids: Held-out runs to analyse (never the training runs).
+        n_images_proposed: Size of the suggested follow-up batch.
+        n_bins: Quantile bins per axis.
+    """
+    from lenscraft.ml.uncertainty import sample_uncertainty as _sample
+
+    if model_id not in ctx.deps.backend.list_models():
+        raise ModelRetry(f"unknown model_id {model_id!r}; see list_models")
+    return _sample(ctx.deps.backend, model_id, run_ids, n_bins=n_bins, n_images_proposed=n_images_proposed)
+
+
 # --------------------------------------------------------------------------------------------
 # Toolsets
 # --------------------------------------------------------------------------------------------
@@ -186,7 +216,7 @@ def full_toolset() -> FunctionToolset[AgentDeps]:
     ts: FunctionToolset[AgentDeps] = FunctionToolset()
     for fn in (simulate_lens_batch, train_classifier, train_anomaly_detector):
         ts.add_function(fn, requires_approval=True)
-    for fn in (summarize_dataset, evaluate_model, list_runs, list_models):
+    for fn in (summarize_dataset, evaluate_model, sample_uncertainty, list_runs, list_models):
         ts.add_function(fn)
     return ts
 

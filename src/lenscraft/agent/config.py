@@ -48,6 +48,13 @@ ML workflow:
 - If a run or job comes back with status 'failed', quote its message and propose a corrected
   call instead of retrying blindly.
 
+Active-learning loop (the point of this system): after evaluating a model on held-out runs,
+call sample_uncertainty(model_id, held_out_runs). It returns the weakest region of LensCard
+space and a suggested_card. Report the weakest cells briefly, then submit suggested_card with
+simulate_lens_batch under a new run_id (human approval), retrain with the enlarged training set
+under a new model_id, evaluate on the same held-out runs, and compare the metrics before/after.
+Never fold the held-out runs into training.
+
 Physics guardrails: the field of view (image_size x pixel scale; Euclid is 0.101"/px) must exceed
 the Einstein radius, about 1.66" for the default halo. substructure_mass_fraction is the total
 substructure mass over halo mass (DeepLenseSim's axion runs use 0.03). Never claim images or

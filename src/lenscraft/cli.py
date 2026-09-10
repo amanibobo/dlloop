@@ -3,6 +3,8 @@
     lenscraft simulate  --substructure vortex --n 100 --seed 0 --run-id run001 [--backend modal]
     lenscraft train     --kind classifier --arch resnet18 --model-id clf_a --runs r1 r2 r3 --epochs 10 [--backend modal]
     lenscraft evaluate  --model-id clf_a --runs r4 [--backend modal]
+    lenscraft uncertainty --model-id clf_a --runs r4 [--backend modal]
+    lenscraft loop      --model-id clf_a --train-runs r1 r2 r3 --test-runs r4 --rounds 2 [--yes] [--backend modal]
     lenscraft agent     "make 200 vortex images and 200 with no substructure" [--backend modal] [--yes]
     lenscraft runs / models  [--backend modal]
     lenscraft summarize run001 run002 [--backend modal]      (or local lensjsonl paths)
@@ -83,6 +85,28 @@ def cmd_train(args: argparse.Namespace) -> int:
 def cmd_evaluate(args: argparse.Namespace) -> int:
     spec = EvalSpec(model_id=args.model_id, run_ids=args.runs, max_images=args.max_images)
     return _print_and_exit(_backend(args).evaluate(spec))
+
+
+def cmd_uncertainty(args: argparse.Namespace) -> int:
+    from lenscraft.ml.uncertainty import sample_uncertainty
+
+    report = sample_uncertainty(_backend(args), args.model_id, args.runs, n_bins=args.n_bins, n_images_proposed=args.n_images)
+    print(report.model_dump_json(indent=2))
+    return 0 if report.status == "ok" else 1
+
+
+def cmd_loop(args: argparse.Namespace) -> int:
+    from lenscraft.agent import auto_approver, console_approver
+    from lenscraft.loop import run_loop
+
+    history = run_loop(
+        _backend(args), model_id=args.model_id, train_runs=args.train_runs, test_runs=args.test_runs, rounds=args.rounds,
+        approve=auto_approver if args.yes else console_approver, epochs=args.epochs, n_images=args.n_images, prefix=args.prefix,
+        max_images=args.max_images, input_size=args.input_size,
+    )
+    for h in history:
+        print(h.model_dump_json(indent=2))
+    return 0 if history and history[-1].new_model_id else 1
 
 
 def cmd_runs(args: argparse.Namespace) -> int:
@@ -176,6 +200,26 @@ def build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--runs", nargs="+", required=True)
     ev.add_argument("--max-images", type=int, dest="max_images")
     ev.set_defaults(func=cmd_evaluate)
+
+    unc = sub.add_parser("uncertainty", parents=[common], help="where is a model weakest? proposes the next LensCard")
+    unc.add_argument("--model-id", required=True, dest="model_id")
+    unc.add_argument("--runs", nargs="+", required=True, help="held-out runs to analyse")
+    unc.add_argument("--n-bins", type=int, default=4, dest="n_bins")
+    unc.add_argument("--n-images", type=int, default=2000, dest="n_images", help="size of the proposed batch")
+    unc.set_defaults(func=cmd_uncertainty)
+
+    lp = sub.add_parser("loop", parents=[common], help="active-learning rounds: uncertainty -> approve -> simulate -> retrain -> evaluate")
+    lp.add_argument("--model-id", required=True, dest="model_id", help="starting trained model")
+    lp.add_argument("--train-runs", nargs="+", required=True, dest="train_runs")
+    lp.add_argument("--test-runs", nargs="+", required=True, dest="test_runs")
+    lp.add_argument("--rounds", type=int, default=1)
+    lp.add_argument("--epochs", type=int, default=10)
+    lp.add_argument("--n-images", type=int, default=2000, dest="n_images")
+    lp.add_argument("--prefix", default="al", help="run_id prefix for the new batches")
+    lp.add_argument("--input-size", type=int, default=150, dest="input_size")
+    lp.add_argument("--max-images", type=int, dest="max_images")
+    lp.add_argument("--yes", action="store_true", help="auto-approve proposed batches")
+    lp.set_defaults(func=cmd_loop)
 
     runs = sub.add_parser("runs", parents=[common], help="list existing runs")
     runs.set_defaults(func=cmd_runs)

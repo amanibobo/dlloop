@@ -10,7 +10,7 @@ design. This README tracks what is actually built.
 | 1 | `LensCard`, `lensjsonl`, standalone `simulate_lens_batch` on Lenstronomy | **built** |
 | 2 | Pydantic AI agent with approval-gated simulation tool; local + Modal compute backends | **built**, verified live (Kimi K3 on Fireworks; batches on Modal) |
 | 3 | ResNet-18/AlexNet classifier, DCAE/VAE/AAE anomaly detectors, `evaluate_model`; GPU training on Modal | **built** |
-| 4 | `sample_uncertainty` active-learning loop | not started |
+| 4 | `sample_uncertainty` tool + `lenscraft loop` driver (uncertainty → approve → simulate → retrain → evaluate) | **built** |
 | 5 | PyAutoLens cross-backend validation (stretch) | not started |
 | 6 | pass@k benchmark harness + report generator | not started |
 
@@ -103,6 +103,27 @@ approve / approve-with-edits / deny, and the run resumes with that decision. Den
 the model with the reason. The `--core-only` flag builds the same agent with no domain tools,
 which is the benchmark baseline arm from DESIGN.md §9. Tools talk only to a `ComputeBackend`,
 so `--backend local|modal` changes where work happens without touching agent code.
+
+## The active-learning loop
+
+`sample_uncertainty` (tool, CLI `lenscraft uncertainty`) joins a model's per-image scores on
+held-out runs with the simulation records and bins each substructure class along physical axes:
+mass fraction, SNR, axion mass (vortex), subhalo count (CDM). Per-image uncertainty is
+1 − P(true class) for classifiers, and for anomaly detectors the fraction of no-substructure
+images whose reconstruction error is at least as large (how ordinary the anomaly looks). The
+weakest cell becomes a `suggested_card` that adds images there, which goes through the same
+approval gate as any other batch.
+
+```sh
+uv run lenscraft uncertainty --backend modal --model-id clf_resnet_5k --runs te1k_none te1k_sub te1k_vor
+uv run lenscraft loop --backend modal --model-id clf_resnet_5k \
+    --train-runs tr5k_none tr5k_sub tr5k_vor --test-runs te1k_none te1k_sub te1k_vor --rounds 2
+```
+
+`lenscraft loop` is the deterministic driver: uncertainty → your approval → simulate → retrain on
+the enlarged set under `<model_id>_r<n>` → re-evaluate on the *same* held-out runs, printing
+before/after metrics per round. The agent does the same through its tools when asked; the driver
+exists so the loop is demonstrable, testable offline, and usable as a scripted benchmark arm.
 
 ## ML notes
 

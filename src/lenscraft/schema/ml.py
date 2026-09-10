@@ -20,6 +20,11 @@ CLASS_NAMES: tuple[str, ...] = ("none", "subhalo", "vortex")
 CLASS_INDEX: dict[str, int] = {name: i for i, name in enumerate(CLASS_NAMES)}
 
 
+def eval_scores_filename(run_ids: list[str]) -> str:
+    """Name of the per-image scores file ``evaluate_model`` writes for a set of runs."""
+    return f"eval_{'-'.join(run_ids)[:60]}.json"
+
+
 class TrainSpec(BaseModel):
     """One training job."""
 

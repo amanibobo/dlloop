@@ -24,7 +24,7 @@ from torch.utils.data import DataLoader
 from lenscraft.ml.data import LensImageDataset, load_run_records
 from lenscraft.models import build_anomaly_model, build_classifier
 from lenscraft.schema.lensjsonl import LensRecord
-from lenscraft.schema.ml import CLASS_INDEX, CLASS_NAMES, EvalResult, EvalSpec, TrainResult, TrainSpec
+from lenscraft.schema.ml import CLASS_INDEX, CLASS_NAMES, EvalResult, EvalSpec, TrainResult, TrainSpec, eval_scores_filename
 
 CHECKPOINT = "model.pt"
 
@@ -204,22 +204,37 @@ def train_model(spec: TrainSpec, data_root: str | Path, models_root: str | Path)
         train_loader = _loader(train_recs, data_root, spec, shuffle=True)
         val_loader = _loader(val_recs, data_root, spec, shuffle=False) if val_recs else None
         anom_loader = _loader(anomalous, data_root, spec, shuffle=False) if anomalous else None
+        # Cosine decay to ~0 over the run damps the epoch-to-epoch swings of a constant-LR Adam
+        # run from scratch; the checkpoint kept is the best validation epoch, not the last one.
+        schedulers = [torch.optim.lr_scheduler.CosineAnnealingLR(o, T_max=spec.epochs) for o in opts.values()]
 
         history: list[dict[str, float]] = []
         metrics: dict[str, float] = {}
+        best_key, best_value, best_state, best_epoch = _selection_key(spec), None, None, 0
         for epoch in range(spec.epochs):
             if spec.kind == "classifier":
                 train_loss = _train_classifier_epoch(model, train_loader, opts["ae"], device)
             else:
                 train_loss = _train_anomaly_epoch(model, train_loader, opts, spec, device)
+            for s in schedulers:
+                s.step()
             row = {"epoch": float(epoch + 1), "train_loss": train_loss}
             if val_loader is not None:
                 row.update(_validate(model, spec, val_loader, anom_loader, device))
             history.append(row)
-            metrics = {k: v for k, v in row.items() if k != "epoch"}
+            value = row.get(best_key[0])
+            if value is None:
+                value = -train_loss  # no validation split: fall back to training loss
+            elif best_key[1] == "min":
+                value = -value
+            if best_value is None or value > best_value:
+                best_value, best_epoch = value, epoch + 1
+                best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+                metrics = {k: v for k, v in row.items() if k != "epoch"}
+        metrics["best_epoch"] = float(best_epoch)
 
         out_dir.mkdir(parents=True, exist_ok=True)
-        torch.save({"spec": spec.model_dump(), "state_dict": model.state_dict(), "class_names": list(CLASS_NAMES)}, out_dir / CHECKPOINT)
+        torch.save({"spec": spec.model_dump(), "state_dict": best_state, "class_names": list(CLASS_NAMES)}, out_dir / CHECKPOINT)
         result = TrainResult(
             status="ok", model_id=spec.model_id, kind=spec.kind, arch=spec.arch, checkpoint_path=str(out_dir / CHECKPOINT),
             n_train=len(train_recs), n_val=len(val_recs), epochs_run=spec.epochs, metrics=metrics, history=history,
@@ -233,6 +248,13 @@ def train_model(spec: TrainSpec, data_root: str | Path, models_root: str | Path)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "train_result.json").write_text(result.model_dump_json(indent=2), encoding="utf-8")
     return result
+
+
+def _selection_key(spec: TrainSpec) -> tuple[str, str]:
+    """(metric, direction) used to pick the checkpoint epoch."""
+    if spec.kind == "classifier":
+        return "val_acc", "max"
+    return "val_loss", "min"
 
 
 def _validate(model, spec: TrainSpec, val_loader, anom_loader, device) -> dict[str, float]:
@@ -317,8 +339,7 @@ def evaluate_model(spec: EvalSpec, data_root: str | Path, models_root: str | Pat
                 per_image.append({"image_id": rec.image_id, "label": CLASS_NAMES[l], "score": float(s),
                                   "mass_fraction": rec.mass_fraction, "snr": rec.snr})
 
-        tag = "-".join(spec.run_ids)[:60]
-        scores_path = models_root / spec.model_id / f"eval_{tag}.json"
+        scores_path = models_root / spec.model_id / eval_scores_filename(spec.run_ids)
         scores_path.write_text(json.dumps({"model_id": spec.model_id, "kind": train_spec.kind, "run_ids": spec.run_ids, "images": per_image}), encoding="utf-8")
         return EvalResult(
             status="ok", model_id=spec.model_id, kind=train_spec.kind, n_images=len(records),
