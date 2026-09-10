@@ -6,6 +6,7 @@
     lenscraft uncertainty --model-id clf_a --runs r4 [--backend modal]
     lenscraft loop      --model-id clf_a --train-runs r1 r2 r3 --test-runs r4 --rounds 2 [--yes] [--backend modal]
     lenscraft agent     "make 200 vortex images and 200 with no substructure" [--backend modal] [--yes]
+    lenscraft bench     --trials 10 --arms tool core            (pass@k benchmark, local backend)
     lenscraft runs / models  [--backend modal]
     lenscraft summarize run001 run002 [--backend modal]      (or local lensjsonl paths)
     lenscraft fetch     run001 --out data                     (copy a Modal run's records locally)
@@ -107,6 +108,19 @@ def cmd_loop(args: argparse.Namespace) -> int:
     for h in history:
         print(h.model_dump_json(indent=2))
     return 0 if history and history[-1].new_model_id else 1
+
+
+def cmd_bench(args: argparse.Namespace) -> int:
+    from lenscraft.bench.run_benchmark import format_summary, run_benchmark
+    from lenscraft.bench.task import BenchTask
+
+    task = BenchTask(n_train_per_class=args.n_train, n_test_per_class=args.n_test, epochs=args.epochs, auc_threshold=args.auc_threshold)
+    _, summary = run_benchmark(
+        arms=tuple(args.arms), trials=args.trials, task=task, model=args.model, out_dir=args.out,
+        keep_workspaces=args.keep, request_limit=args.request_limit,
+    )
+    print(format_summary(summary))
+    return 0
 
 
 def cmd_runs(args: argparse.Namespace) -> int:
@@ -220,6 +234,19 @@ def build_parser() -> argparse.ArgumentParser:
     lp.add_argument("--max-images", type=int, dest="max_images")
     lp.add_argument("--yes", action="store_true", help="auto-approve proposed batches")
     lp.set_defaults(func=cmd_loop)
+
+    be = sub.add_parser("bench", help="benchmark: tool-assisted vs core-only agent, N trials each, pass@k + stagewise reach (local backend)")
+    be.add_argument("--trials", type=int, default=10)
+    be.add_argument("--arms", nargs="+", choices=["tool", "core"], default=["tool", "core"])
+    be.add_argument("--model", help="Pydantic AI model string (default: $LENSCRAFT_MODEL)")
+    be.add_argument("--n-train", type=int, default=24, dest="n_train", help="training images per class")
+    be.add_argument("--n-test", type=int, default=8, dest="n_test", help="test images per class")
+    be.add_argument("--epochs", type=int, default=1)
+    be.add_argument("--auc-threshold", type=float, default=0.5, dest="auc_threshold")
+    be.add_argument("--request-limit", type=int, default=60, dest="request_limit", help="max approval rounds per trial")
+    be.add_argument("--out", default="reports/bench")
+    be.add_argument("--keep", action="store_true", help="keep trial workspaces for inspection")
+    be.set_defaults(func=cmd_bench)
 
     runs = sub.add_parser("runs", parents=[common], help="list existing runs")
     runs.set_defaults(func=cmd_runs)

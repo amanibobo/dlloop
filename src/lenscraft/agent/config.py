@@ -62,6 +62,14 @@ models exist without a successful tool result.
 """
 
 
+CORE_INSTRUCTIONS = """\
+You are an agent working in a sandbox with a shell and file tools. `python` has numpy, scipy,
+astropy, lenstronomy, torch, torchvision and scikit-learn installed. Write scripts, run them,
+read their output, and fix errors until the task's deliverables exist on disk in the required
+layout. Do not stop until they do, or you have run out of ideas; then summarise what exists.
+"""
+
+
 def build_agent(
     model: str | None = None,
     *,
@@ -72,13 +80,13 @@ def build_agent(
     Args:
         model: Pydantic AI model string, e.g. ``anthropic:claude-opus-5`` or
             ``fireworks:accounts/fireworks/models/kimi-k3``; defaults to ``$LENSCRAFT_MODEL``.
-        core_only: benchmark baseline arm (DESIGN.md Section 9): no domain tools registered.
+        core_only: benchmark baseline arm (DESIGN.md Section 9): shell + file tools only.
     """
     return Agent(
         model or DEFAULT_MODEL,
         deps_type=AgentDeps,
         output_type=[str, DeferredToolRequests],
-        instructions=INSTRUCTIONS,
+        instructions=CORE_INSTRUCTIONS if core_only else INSTRUCTIONS,
         toolsets=[core_toolset() if core_only else full_toolset()],
-        name="lenscraft",
+        name="lenscraft-core" if core_only else "lenscraft",
     )

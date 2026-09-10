@@ -13,7 +13,7 @@ from collections.abc import Callable, Sequence
 from typing import Any
 
 from pydantic import ValidationError
-from pydantic_ai import Agent, DeferredToolRequests, DeferredToolResults, ToolApproved, ToolDenied
+from pydantic_ai import Agent, DeferredToolRequests, DeferredToolResults, ToolApproved, ToolDenied, UsageLimits
 from pydantic_ai.agent import AgentRunResult
 from pydantic_ai.messages import ModelMessage
 
@@ -39,9 +39,14 @@ def run_with_approval(
     *,
     message_history: Sequence[ModelMessage] | None = None,
     max_rounds: int = 20,
+    usage_limits: UsageLimits | None = None,
 ) -> AgentRunResult[str | DeferredToolRequests]:
-    """Run until the agent produces text, resolving every approval request through ``approve``."""
-    result = agent.run_sync(prompt, deps=deps, message_history=message_history)
+    """Run until the agent produces text, resolving every approval request through ``approve``.
+
+    ``usage_limits`` applies per run segment (each approval resume is a new run); it bounds the
+    number of model requests between two human decisions.
+    """
+    result = agent.run_sync(prompt, deps=deps, message_history=message_history, usage_limits=usage_limits)
     for _ in range(max_rounds):
         if not isinstance(result.output, DeferredToolRequests):
             return result
@@ -57,6 +62,7 @@ def run_with_approval(
             deferred_tool_results=DeferredToolResults(approvals=approvals),
             message_history=result.all_messages(),
             deps=deps,
+            usage_limits=usage_limits,
         )
     raise RuntimeError(f"agent still requesting approval after {max_rounds} rounds")
 

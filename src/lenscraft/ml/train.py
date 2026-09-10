@@ -236,13 +236,13 @@ def train_model(spec: TrainSpec, data_root: str | Path, models_root: str | Path)
         out_dir.mkdir(parents=True, exist_ok=True)
         torch.save({"spec": spec.model_dump(), "state_dict": best_state, "class_names": list(CLASS_NAMES)}, out_dir / CHECKPOINT)
         result = TrainResult(
-            status="ok", model_id=spec.model_id, kind=spec.kind, arch=spec.arch, checkpoint_path=str(out_dir / CHECKPOINT),
+            status="ok", model_id=spec.model_id, kind=spec.kind, arch=spec.arch, run_ids=list(spec.run_ids), checkpoint_path=str(out_dir / CHECKPOINT),
             n_train=len(train_recs), n_val=len(val_recs), epochs_run=spec.epochs, metrics=metrics, history=history,
             elapsed_seconds=time.perf_counter() - t0,
         )
     except Exception as exc:  # noqa: BLE001 - structured failure for the agent
         result = TrainResult(
-            status="failed", model_id=spec.model_id, kind=spec.kind, arch=spec.arch,
+            status="failed", model_id=spec.model_id, kind=spec.kind, arch=spec.arch, run_ids=list(spec.run_ids),
             elapsed_seconds=time.perf_counter() - t0, message=f"{type(exc).__name__}: {exc}",
         )
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -340,7 +340,11 @@ def evaluate_model(spec: EvalSpec, data_root: str | Path, models_root: str | Pat
                                   "mass_fraction": rec.mass_fraction, "snr": rec.snr})
 
         scores_path = models_root / spec.model_id / eval_scores_filename(spec.run_ids)
-        scores_path.write_text(json.dumps({"model_id": spec.model_id, "kind": train_spec.kind, "run_ids": spec.run_ids, "images": per_image}), encoding="utf-8")
+        scores_path.write_text(
+            json.dumps({"model_id": spec.model_id, "kind": train_spec.kind, "run_ids": spec.run_ids,
+                        "auc": None if auc is None or math.isnan(auc) else auc, "metrics": metrics, "images": per_image}),
+            encoding="utf-8",
+        )
         return EvalResult(
             status="ok", model_id=spec.model_id, kind=train_spec.kind, n_images=len(records),
             auc=None if auc is None or math.isnan(auc) else auc, metrics=metrics, per_class=per_class,

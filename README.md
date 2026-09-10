@@ -12,7 +12,8 @@ design. This README tracks what is actually built.
 | 3 | ResNet-18/AlexNet classifier, DCAE/VAE/AAE anomaly detectors, `evaluate_model`; GPU training on Modal | **built** |
 | 4 | `sample_uncertainty` tool + `lenscraft loop` driver (uncertainty → approve → simulate → retrain → evaluate) | **built** |
 | 5 | PyAutoLens cross-backend validation (stretch) | not started |
-| 6 | pass@k benchmark harness + report generator | not started |
+| 6a | pass@k benchmark harness: tool-assisted vs core-only (shell + files) arms, stagewise rubric | **built** |
+| 6b | report generator | not started |
 
 ## Setup
 
@@ -124,6 +125,27 @@ uv run lenscraft loop --backend modal --model-id clf_resnet_5k \
 the enlarged set under `<model_id>_r<n>` → re-evaluate on the *same* held-out runs, printing
 before/after metrics per round. The agent does the same through its tools when asked; the driver
 exists so the loop is demonstrable, testable offline, and usable as a scripted benchmark arm.
+
+## Benchmark (HEPTAPOD-style)
+
+```sh
+uv run lenscraft bench --trials 10 --arms tool core            # default tiny task, ~1-3 min per trial
+uv run lenscraft bench --trials 5 --arms core --keep --out reports/bench_core
+```
+
+Two arms, same model, same task prompt, fresh sandbox per trial, local backend:
+
+- **tool**: the LensCraft agent with its domain tools (batches and training auto-approved).
+- **core**: the same model with only `run_shell` / `write_file` / `read_file` / `list_files` in
+  the sandbox, Python with lenstronomy and torch on PATH, the required output layout spelled out
+  in the prompt, and the `lenscraft` package blocked. It has to build the pipeline itself.
+
+The task: simulate train and held-out test runs for the three classes, train a ResNet-18, report
+the held-out macro AUC. Grading reads the sandbox, so it is identical for both arms. Stages are
+cumulative and weighted: simulate 0.25 → label 0.15 → train 0.35 (training runs only) → AUC 0.25
+(evaluated on the held-out runs, above threshold). *Reach* is the summed weight of passed stages;
+pass@k and pass^k use the unbiased estimators. Results go to `reports/bench/results.jsonl` and
+`summary.json`.
 
 ## ML notes
 

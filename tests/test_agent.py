@@ -125,7 +125,7 @@ def test_core_only_agent_has_no_domain_tools():
         return ModelResponse(parts=[TextPart(",".join(sorted(t.name for t in info.function_tools)) or "no-tools")])
 
     result = build_agent(FunctionModel(fn), core_only=True).run_sync("hi", deps=AgentDeps(backend=LocalBackend()))
-    assert result.output == "no-tools"
+    assert result.output == "list_files,read_file,run_shell,write_file"
 
     result = build_agent(FunctionModel(fn)).run_sync("hi", deps=AgentDeps(backend=LocalBackend()))
     assert result.output == "evaluate_model,list_models,list_runs,sample_uncertainty,simulate_lens_batch,summarize_dataset,train_anomaly_detector,train_classifier"

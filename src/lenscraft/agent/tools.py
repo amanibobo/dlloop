@@ -222,5 +222,7 @@ def full_toolset() -> FunctionToolset[AgentDeps]:
 
 
 def core_toolset() -> FunctionToolset[AgentDeps]:
-    """Benchmark baseline: no domain tools (DESIGN.md Section 9, core-only arm)."""
-    return FunctionToolset()
+    """Benchmark baseline: shell + file tools only, no domain tools (DESIGN.md Section 9)."""
+    from lenscraft.agent.core_tools import core_toolset as _core
+
+    return _core()

@@ -60,6 +60,7 @@ class TrainResult(BaseModel):
     model_id: str
     kind: ModelKind
     arch: str
+    run_ids: list[str] = Field(default_factory=list, description="Runs the model was trained on.")
     checkpoint_path: str = ""
     n_train: int = 0
     n_val: int = 0
