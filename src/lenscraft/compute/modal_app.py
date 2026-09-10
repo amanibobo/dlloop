@@ -111,7 +111,7 @@ def list_runs() -> list[str]:
 # --------------------------------------------------------------------------------------------
 
 
-@app.function(image=ml_image, gpu=TRAIN_GPU, volumes={DATA_DIR: volume}, timeout=6 * 3600)
+@app.function(image=ml_image, gpu=TRAIN_GPU, volumes={DATA_DIR: volume}, cpu=4.0, memory=16384, timeout=6 * 3600)
 def train_model(spec_json: str) -> dict:
     """Train a classifier or anomaly detector on runs from the Volume; checkpoint goes to /data/_models."""
     from lenscraft.ml.train import train_model as _train
@@ -123,7 +123,7 @@ def train_model(spec_json: str) -> dict:
     return result.model_dump()
 
 
-@app.function(image=ml_image, gpu=TRAIN_GPU, volumes={DATA_DIR: volume}, timeout=3600)
+@app.function(image=ml_image, gpu=TRAIN_GPU, volumes={DATA_DIR: volume}, cpu=4.0, memory=16384, timeout=3600)
 def evaluate_model(spec_json: str) -> dict:
     from lenscraft.ml.train import evaluate_model as _evaluate
     from lenscraft.schema import EvalSpec

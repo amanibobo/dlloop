@@ -43,6 +43,21 @@ def load_image(path: str | Path, input_size: int) -> torch.Tensor:
 
 
 PRELOAD_MAX_BYTES = 4 * 1024**3  # keep datasets up to ~4 GB of float32 pixels in RAM
+PRELOAD_THREADS = 32  # file reads on a network volume are latency-bound; threads overlap them
+
+
+def preload_images(records: list[LensRecord], data_root: Path, input_size: int) -> torch.Tensor:
+    """Decode + resize all images into one (N, 1, S, S) tensor, reading files concurrently."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    out = torch.empty((len(records), 1, input_size, input_size), dtype=torch.float32)
+
+    def _fill(i: int) -> None:
+        out[i] = load_image(record_image_path(data_root, records[i]), input_size)
+
+    with ThreadPoolExecutor(max_workers=min(PRELOAD_THREADS, max(1, len(records)))) as pool:
+        list(pool.map(_fill, range(len(records))))
+    return out
 
 
 class LensImageDataset(Dataset):
@@ -59,7 +74,7 @@ class LensImageDataset(Dataset):
             preload = len(records) * input_size * input_size * 4 <= PRELOAD_MAX_BYTES
         self.images: torch.Tensor | None = None
         if preload and records:
-            self.images = torch.stack([load_image(record_image_path(self.data_root, r), input_size) for r in records])
+            self.images = preload_images(records, self.data_root, input_size)
 
     def __len__(self) -> int:
         return len(self.records)
