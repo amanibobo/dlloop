@@ -15,6 +15,12 @@ design. This README tracks what is actually built.
 | 6a | pass@k benchmark harness: tool-assisted vs core-only (shell + files) arms, stagewise rubric | **built** |
 | 6b | report generator (`lenscraft report`, agent tool `generate_report`) | **built** |
 
+## Case-study site
+
+[`site/`](site/) is a Next.js case study of the whole project (problem, design decisions,
+architecture diagrams, the build log, results, demo videos, how to reproduce). `cd site && npm
+install && npm run dev`, or deploy to Vercel with the root directory set to `site`.
+
 ## Setup
 
 ```sh
