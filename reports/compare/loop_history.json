@@ -1,0 +1,29 @@
+[
+  {
+    "round": 1,
+    "model_id": "clf_base_b",
+    "weakest": {
+      "substructure": "vortex",
+      "axis": "axion_mass",
+      "low": 1.0037602658280746e-24,
+      "high": 2.8321320581340906e-24,
+      "n": 250,
+      "mean_uncertainty": 0.6229110751748085,
+      "score": 0.288
+    },
+    "proposed_run_id": "al_r1",
+    "approved": true,
+    "new_run_id": "al_r1",
+    "n_new_images": 2000,
+    "new_model_id": "clf_al_b",
+    "metrics_before": {
+      "accuracy": 0.9283333333333333,
+      "auc": 0.9793799166666667
+    },
+    "metrics_after": {
+      "accuracy": 0.9,
+      "auc": 0.9802313333333332
+    },
+    "message": "control clf_uni_b (2000 uniform images): accuracy 0.930, auc 0.978"
+  }
+]

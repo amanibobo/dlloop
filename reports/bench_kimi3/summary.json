@@ -1,0 +1,73 @@
+{
+  "task": {
+    "name": "three_class_classifier",
+    "classes": [
+      "none",
+      "subhalo",
+      "vortex"
+    ],
+    "n_train_per_class": 32,
+    "n_test_per_class": 16,
+    "image_size": 32,
+    "mass_fraction": 0.1,
+    "arch": "resnet18",
+    "epochs": 2,
+    "input_size": 96,
+    "auc_threshold": null,
+    "train_prefix": "train",
+    "test_prefix": "test",
+    "model_id": "clf"
+  },
+  "arms": [
+    {
+      "arm": "core",
+      "n": 3,
+      "successes": 3,
+      "pass_at_k": {
+        "1": 1.0,
+        "3": 1.0
+      },
+      "pass_pow_k": {
+        "1": 1.0,
+        "3": 1.0
+      },
+      "reach_mean": 1.0,
+      "reach_std": 0.0,
+      "stage_pass_rate": {
+        "simulate": 1.0,
+        "label": 1.0,
+        "train": 1.0,
+        "auc": 1.0
+      },
+      "mean_duration_seconds": 894.3028374306645,
+      "mean_requests": 30.333333333333332,
+      "mean_tokens": 857101.3333333334,
+      "errors": 0
+    },
+    {
+      "arm": "tool",
+      "n": 3,
+      "successes": 3,
+      "pass_at_k": {
+        "1": 1.0,
+        "3": 1.0
+      },
+      "pass_pow_k": {
+        "1": 1.0,
+        "3": 1.0
+      },
+      "reach_mean": 1.0,
+      "reach_std": 0.0,
+      "stage_pass_rate": {
+        "simulate": 1.0,
+        "label": 1.0,
+        "train": 1.0,
+        "auc": 1.0
+      },
+      "mean_duration_seconds": 102.57785370800411,
+      "mean_requests": 6.0,
+      "mean_tokens": 36035.333333333336,
+      "errors": 0
+    }
+  ]
+}
