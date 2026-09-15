@@ -254,12 +254,26 @@ def _bench_section(summary: dict[str, Any], out_dir: Path, figures: list[str]) -
         for i, a in enumerate(arms):
             ax.bar(x + i * width - 0.4 + width / 2, [a["stage_pass_rate"][s] for s in stages], width * 0.92, color=ARM_COLORS.get(a["arm"], MUTED), label=a["arm"])
         ax.set_xticks(x, stages)
-        ax.set_ylim(0, 1)
+        ax.set_ylim(0, 1.05)
         ax.set_ylabel("stage pass rate")
         ax.set_title("Stagewise pass rate by arm")
-        ax.legend()
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18), ncol=len(arms))
         _style(ax)
         md.append(f"\n![stage pass rates]({_save(fig, out_dir, 'bench_stages', figures)})\n")
+
+        # cost per trial: two measures of different scale -> two panels, one axis each
+        fig, axes = plt.subplots(1, 3, figsize=(9, 2.8))
+        for ax, key, label in ((axes[0], "mean_requests", "model requests"), (axes[1], "mean_tokens", "tokens"), (axes[2], "mean_duration_seconds", "wall time (s)")):
+            names = [a["arm"] for a in arms]
+            vals = [a[key] for a in arms]
+            ax.bar(names, vals, color=[ARM_COLORS.get(n, MUTED) for n in names], width=0.6)
+            for i, v in enumerate(vals):
+                ax.text(i, v, f"{v:,.0f}", ha="center", va="bottom", fontsize=9, color=INK2)
+            ax.set_ylabel(label)
+            ax.set_ylim(0, max(vals) * 1.18 if max(vals) > 0 else 1)
+            _style(ax)
+        axes[0].set_title("Mean cost per trial")
+        md.append(f"![cost per trial]({_save(fig, out_dir, 'bench_cost', figures)})\n")
     return "\n".join(md) + "\n"
 
 

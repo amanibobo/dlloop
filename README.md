@@ -174,9 +174,27 @@ Two arms, same model, same task prompt, fresh sandbox per trial, local backend:
 The task: simulate train and held-out test runs for the three classes, train a ResNet-18, report
 the held-out macro AUC. Grading reads the sandbox, so it is identical for both arms. Stages are
 cumulative and weighted: simulate 0.25 → label 0.15 → train 0.35 (training runs only) → AUC 0.25
-(evaluated on the held-out runs, above threshold). *Reach* is the summed weight of passed stages;
-pass@k and pass^k use the unbiased estimators. Results go to `reports/bench/results.jsonl` and
-`summary.json`.
+(evaluated on the held-out runs, and the AUC the agent *reports* matches the file). *Reach* is the
+summed weight of passed stages; pass@k and pass^k use the unbiased estimators. Results go to
+`reports/bench/results.jsonl` and `summary.json`.
+
+### Result (Kimi K3 on Fireworks, 3 trials per arm, 2026-09-15, `reports/bench_kimi3`)
+
+| arm | pass | pass@1 | reach | mean requests | mean tokens | mean wall time | held-out AUC reached |
+|---|---|---|---|---|---|---|---|
+| tool | 3/3 | 1.00 | 1.00 | 6 | 36k | 103 s | 0.61, 0.61, 0.61 |
+| core | 3/3 | 1.00 | 1.00 | 30 | 857k | 894 s | 0.85, 0.96, 0.96 |
+
+With a strong model both arms complete the task every time, so the value of the domain tools
+shows up as cost and reliability: 24× fewer tokens, 9× less wall time, 5× fewer model
+requests, and a deterministic, reproducible pipeline (identical AUC across trials). Two
+caveats worth stating plainly. First, n = 3 per arm; the estimators are exact for the sample
+but the sample is small. Second, the core arm reached *higher* AUCs on this tiny task by
+engineering its own preprocessing (an asinh stretch, dihedral augmentation, a small-image ResNet
+stem), which the tool arm's fixed training recipe does not do. The first two are data-pipeline
+choices the ML tier should adopt; the stem is an architecture change and stays out of the port.
+An earlier run with a weaker task config (`reports/bench_kimi2`) was cut short by a network
+outage, which is why the harness now retries infrastructure errors instead of scoring them.
 
 ## Reports
 
