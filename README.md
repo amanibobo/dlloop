@@ -192,13 +192,17 @@ Runs on the Volume: `tr5k_{none,sub,vor}` (5,000 each, seeds 100-102) and `te1k_
 | Model | Training data | Test acc | Test AUC | none / subhalo / vortex acc | Weak cell acc |
 |---|---|---|---|---|---|
 | `clf_base_b` | 15,000 | 0.928 | 0.979 | 1.00 / 0.96 / 0.82 | 0.29 |
-| `clf_al_b` | 15,000 + 2,000 targeted | 0.900 | 0.980 | 1.00 / 0.79 / 0.91 | 0.62 |
+| `clf_uni_b` | 15,000 + 2,000 **uniform** (`uni_*`, 667/class, default axion sampling) | 0.930 | 0.978 | 1.00 / 0.97 / 0.82 | 0.28 |
+| `clf_al_b` | 15,000 + 2,000 **targeted** (`al_r1`) | 0.900 | 0.980 | 1.00 / 0.79 / 0.91 | 0.62 |
 
-The targeted batch doubled accuracy in the weak region and lifted vortex accuracy overall, at
-the cost of subhalo accuracy (the added light-axion vortices are the ones that look most like
-subhalos, and the classes are now unbalanced). A second round would flag subhalos as the
-weakest class and propose the balancing batch. That is the loop working as intended; whether it
-converges to a better model than uniform sampling of the same budget is the Phase 6 benchmark.
+Same budget, same recipe, same seed: the uniform batch is indistinguishable from no batch at
+all, while the targeted batch doubles accuracy in the weak region and lifts vortex accuracy
+overall, at the cost of subhalo accuracy (the added light-axion vortices are the ones that look
+most like subhalos, and the classes are now unbalanced). A second round would flag subhalos as
+the weakest class and propose the balancing batch. That is the loop working as intended: the
+uncertainty signal finds a region uniform sampling cannot, and the remaining question is how
+to trade the targeted gain against the imbalance it introduces (e.g. class-balanced batches, or
+re-weighting).
 
 The classifier matches the ballpark of Alexander et al. 2019. The AAE is far from the 2021 paper's
 0.93: at this mass fraction and resolution the substructure perturbs the arcs by ~1% of the peak,

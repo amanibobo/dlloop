@@ -22,6 +22,15 @@ from lenscraft.bench.task import BenchTask
 from lenscraft.compute.backend import LocalBackend
 
 ARMS = ("tool", "core")
+INFRA_ERROR_MARKERS = ("Connection error", "APIConnectionError", "ConnectError", "timed out", "503", "502", "429")
+INFRA_RETRIES = 3
+INFRA_RETRY_SLEEP = 60.0
+
+
+def is_infra_error(error: str) -> bool:
+    """A provider/network failure, not the agent failing the task."""
+    first = error.splitlines()[0] if error else ""
+    return any(m in first for m in INFRA_ERROR_MARKERS)
 
 
 class TrialResult(BaseModel):
@@ -151,8 +160,15 @@ def run_benchmark(
     with results_path.open("a", encoding="utf-8") as fh:
         for trial in range(1, trials + 1):
             for arm in arms:
-                ws = Path(tempfile.mkdtemp(prefix=f"lenscraft-bench-{arm}-{trial}-"))
-                res = run_trial(arm, trial, task, model=model, workspace=ws, request_limit=request_limit, agent_factory=agent_factory)
+                for attempt in range(1, INFRA_RETRIES + 1):
+                    ws = Path(tempfile.mkdtemp(prefix=f"lenscraft-bench-{arm}-{trial}-"))
+                    res = run_trial(arm, trial, task, model=model, workspace=ws, request_limit=request_limit, agent_factory=agent_factory)
+                    if not (res.error and is_infra_error(res.error)) or attempt == INFRA_RETRIES:
+                        break
+                    # provider/network failure: this attempt says nothing about the agent, so retry it
+                    progress(f"[{arm} #{trial}] infrastructure error ({res.error.splitlines()[0][:80]}); retrying in {INFRA_RETRY_SLEEP:.0f}s ({attempt}/{INFRA_RETRIES})")
+                    shutil.rmtree(ws, ignore_errors=True)
+                    time.sleep(INFRA_RETRY_SLEEP)
                 results.append(res)
                 fh.write(res.model_dump_json() + "\n")
                 fh.flush()
