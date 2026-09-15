@@ -11,7 +11,7 @@ design. This README tracks what is actually built.
 | 2 | Pydantic AI agent with approval-gated simulation tool; local + Modal compute backends | **built**, verified live (Kimi K3 on Fireworks; batches on Modal) |
 | 3 | ResNet-18/AlexNet classifier, DCAE/VAE/AAE anomaly detectors, `evaluate_model`; GPU training on Modal | **built** |
 | 4 | `sample_uncertainty` tool + `lenscraft loop` driver (uncertainty → approve → simulate → retrain → evaluate) | **built** |
-| 5 | PyAutoLens cross-backend validation (stretch) | not started |
+| 5 | PyAutoLens backend + `cross_backend_validate` (stretch) | **built**: engines agree to ~2% of peak on identical systems |
 | 6a | pass@k benchmark harness: tool-assisted vs core-only (shell + files) arms, stagewise rubric | **built** |
 | 6b | report generator (`lenscraft report`, agent tool `generate_report`) | **built** |
 
@@ -125,6 +125,37 @@ uv run lenscraft loop --backend modal --model-id clf_resnet_5k \
 the enlarged set under `<model_id>_r<n>` → re-evaluate on the *same* held-out runs, printing
 before/after metrics per round. The agent does the same through its tools when asked; the driver
 exists so the loop is demonstrable, testable offline, and usable as a scripted benchmark arm.
+
+## Cross-backend validation (PyAutoLens)
+
+`lenscraft.sim.pyautolens_backend` renders the *same* `LensSystem` the lenstronomy backend builds
+through PyAutoLens, and `cross_backend_validate` (tool, CLI `lenscraft crosscheck`) compares the
+unconvolved noiseless models image by image. The convention mapping was established empirically
+by minimising the residual over every orientation and sign combination: PyAutoLens takes
+`ell_comps = (e2, e1)`, shear unchanged, centres as `(y, x)`, its native array is flipped
+vertically, and it returns surface brightness (lenstronomy: counts per pixel, i.e. × pixel area).
+
+```sh
+uv run lenscraft crosscheck --backend modal --substructure vortex --n 5     # PyAutoLens lives in its own Modal image
+uv run --python .venv-autolens/bin/python -m lenscraft.cli crosscheck --substructure subhalo   # or a local venv with autolens
+```
+
+Result on Modal (96 px, 0.05"/px, 5 systems per class, seed 7):
+
+| class | shape rel. rms (mean / max, fraction of peak) | flux ratio | centroid shift |
+|---|---|---|---|
+| none | 0.0063 / 0.0099 | 0.996 | ≤ 0.05 px |
+| subhalo | 0.0074 / 0.0118 | 0.996 | ≤ 0.04 px |
+| vortex | 0.0057 / 0.0065 | 0.996 | ≤ 0.04 px |
+
+The residual per-cent level is the two packages' slightly different elliptical-radius
+conventions, not a bug on either side; the point-mass substructure agrees as well as the smooth
+lens does.
+
+PyAutoLens is not a core dependency (it pins an older scikit-learn); install it into a separate
+venv (`uv venv .venv-autolens && uv pip install --python .venv-autolens/bin/python autolens -e .`)
+or use the Modal backend. `LensCard(backend="pyautolens")` renders full datasets with it
+(`custom` instrument only).
 
 ## Benchmark (HEPTAPOD-style)
 

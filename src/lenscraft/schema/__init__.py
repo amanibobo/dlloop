@@ -1,3 +1,4 @@
+from lenscraft.schema.crosscheck import CrossCheckResult
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
 from lenscraft.schema.lensjsonl import (
     LensRecord,
@@ -13,6 +14,7 @@ from lenscraft.schema.uncertainty import UncertaintyCell, UncertaintyReport
 __all__ = [
     "CLASS_INDEX",
     "CLASS_NAMES",
+    "CrossCheckResult",
     "EvalResult",
     "EvalSpec",
     "LensCard",

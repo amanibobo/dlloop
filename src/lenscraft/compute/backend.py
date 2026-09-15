@@ -19,6 +19,7 @@ from typing import Any, Literal, Protocol, runtime_checkable
 import numpy as np
 from pydantic import BaseModel, ConfigDict
 
+from lenscraft.schema.crosscheck import CrossCheckResult
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
 from lenscraft.schema.lensjsonl import LensRecord, read_records
 from lenscraft.schema.ml import EvalResult, EvalSpec, TrainResult, TrainSpec, eval_scores_filename
@@ -69,6 +70,9 @@ class ComputeBackend(Protocol):
 
     def read_eval_scores(self, model_id: str, run_ids: list[str]) -> dict[str, Any] | None:
         """Per-image scores written by ``evaluate`` for these runs, or None if not evaluated yet."""
+
+    def cross_validate(self, card: LensCard, n_images: int = 5) -> CrossCheckResult:
+        """Compare lenstronomy and PyAutoLens on systems drawn from ``card``."""
 
 
 def _wait(backend: ComputeBackend, job_id: str, poll_seconds: float, timeout: float | None) -> JobStatus:
@@ -160,6 +164,11 @@ class LocalBackend:
     def read_image(self, run_id: str, image_path: str) -> np.ndarray | None:
         path = self.data_dir / run_id / image_path
         return np.load(path) if path.exists() else None
+
+    def cross_validate(self, card: LensCard, n_images: int = 5) -> CrossCheckResult:
+        from lenscraft.sim.crosscheck import cross_backend_validate  # needs autolens
+
+        return cross_backend_validate(card, n_images)
 
 
 # ------------------------------------------------------------------------------------------
@@ -270,6 +279,9 @@ class ModalBackend:
                 return None
             raise
         return np.load(io.BytesIO(data))
+
+    def cross_validate(self, card: LensCard, n_images: int = 5) -> CrossCheckResult:
+        return CrossCheckResult.model_validate(self._fn("cross_validate").remote(card.model_dump_json(), n_images))
 
 
 def get_backend(name: str, *, data_dir: str | Path = "data") -> ComputeBackend:

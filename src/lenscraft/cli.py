@@ -153,6 +153,14 @@ def _split_json_objects(text: str) -> list[str]:
     return out
 
 
+def cmd_crosscheck(args: argparse.Namespace) -> int:
+    card = LensCard(n_images=args.n, substructure=args.substructure, instrument="custom", image_size=args.image_size, pixel_scale=args.pixel_scale,
+                    substructure_mass_fraction=args.mass_fraction, seed=args.seed)
+    result = _backend(args).cross_validate(card, args.n)
+    print(result.model_dump_json(indent=2, exclude={"card"}))
+    return 0 if result.status == "ok" and result.agree else 1
+
+
 def cmd_runs(args: argparse.Namespace) -> int:
     for run_id in _backend(args).list_runs():
         print(run_id)
@@ -288,6 +296,15 @@ def build_parser() -> argparse.ArgumentParser:
     rp.add_argument("--title", default="LensCraft run report")
     rp.add_argument("--out", default="reports/report")
     rp.set_defaults(func=cmd_report)
+
+    xc = sub.add_parser("crosscheck", parents=[common], help="lenstronomy vs PyAutoLens on identical systems (needs autolens locally, or --backend modal)")
+    xc.add_argument("--substructure", choices=["none", "subhalo", "vortex"], default="none")
+    xc.add_argument("--n", type=int, default=5, help="systems to compare")
+    xc.add_argument("--image-size", type=int, default=96, dest="image_size")
+    xc.add_argument("--pixel-scale", type=float, default=0.05, dest="pixel_scale")
+    xc.add_argument("--mass-fraction", type=float, default=0.03, dest="mass_fraction")
+    xc.add_argument("--seed", type=int, default=0)
+    xc.set_defaults(func=cmd_crosscheck)
 
     runs = sub.add_parser("runs", parents=[common], help="list existing runs")
     runs.set_defaults(func=cmd_runs)

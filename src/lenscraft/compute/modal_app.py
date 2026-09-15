@@ -41,6 +41,13 @@ ml_image = (
     .add_local_python_source("lenscraft")
 )
 
+# PyAutoLens for the cross-backend check lives in its own image: it pins an older scikit-learn.
+xval_image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .uv_pip_install(*_base_packages, "autolens")
+    .add_local_python_source("lenscraft")
+)
+
 volume = modal.Volume.from_name(VOLUME_NAME, create_if_missing=True)
 
 
@@ -151,6 +158,15 @@ def read_file(path: str) -> str:
     if not p.exists():
         raise FileNotFoundError(f"no file {path!r} on volume {VOLUME_NAME}")
     return p.read_text(encoding="utf-8")
+
+
+@app.function(image=xval_image, cpu=2.0, timeout=1800)
+def cross_validate(card_json: str, n_images: int = 5) -> dict:
+    """lenstronomy vs PyAutoLens on the same systems (custom instrument); no Volume access needed."""
+    from lenscraft.schema import LensCard
+    from lenscraft.sim.crosscheck import cross_backend_validate
+
+    return cross_backend_validate(LensCard.model_validate_json(card_json), n_images).model_dump()
 
 
 @app.function(image=sim_image, volumes={DATA_DIR: volume})

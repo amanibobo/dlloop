@@ -33,7 +33,10 @@ def _get_backend(name: str):
 
         return lenstronomy_backend.simulate_one
     if name == "pyautolens":
-        raise NotImplementedError("pyautolens backend is a Phase 5 stretch goal (DESIGN.md Section 11)")
+        from lenscraft.sim import pyautolens_backend  # needs the optional 'autolens' package
+
+        pyautolens_backend._al()
+        return pyautolens_backend.simulate_one
     raise ValueError(f"unknown backend {name!r}")
 
 

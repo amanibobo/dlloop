@@ -102,7 +102,7 @@ def test_undersized_field_of_view_is_a_structured_failure(tmp_path):
     assert "field of view" in result.message
 
 
-def test_pyautolens_backend_not_yet_available(tmp_path):
-    card = LensCard(n_images=1, substructure="none", backend="pyautolens")
+def test_pyautolens_backend_needs_custom_instrument_or_autolens(tmp_path):
+    card = LensCard(n_images=1, substructure="none", backend="pyautolens")  # euclid instrument
     result = simulate_lens_batch(card, tmp_path, run_id="p")
-    assert result.status == "failed" and result.message.startswith("NotImplementedError")
+    assert result.status == "failed" and ("autolens" in result.message or "custom" in result.message)

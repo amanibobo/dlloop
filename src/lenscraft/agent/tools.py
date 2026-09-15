@@ -15,6 +15,7 @@ from typing import Any, Literal, Optional
 from pydantic_ai import FunctionToolset, ModelRetry, RunContext
 
 from lenscraft.agent.deps import AgentDeps
+from lenscraft.schema.crosscheck import CrossCheckResult
 from lenscraft.schema.lens_card import LensCard, SimBatchResult
 from lenscraft.schema.lensjsonl import summarize_records
 from lenscraft.schema.ml import EvalResult, EvalSpec, TrainResult, TrainSpec
@@ -56,6 +57,20 @@ def simulate_lens_batch(ctx: RunContext[AgentDeps], card: LensCard, run_id: str)
     if status.result.status == "ok":
         ctx.deps.run_ids.append(run_id)
     return status.result
+
+
+def cross_backend_validate(ctx: RunContext[AgentDeps], card: LensCard, n_images: int = 5) -> CrossCheckResult:
+    """Check the simulation engine against an independent one: render the same lens systems with
+    lenstronomy and PyAutoLens and compare the noiseless model images.
+
+    Use a card with instrument='custom' (e.g. image_size=96, pixel_scale=0.05). Returns per-image
+    shape residuals (fraction of peak), flux ratios, and whether they are within tolerance.
+
+    Args:
+        card: Simulation configuration to draw systems from (instrument must be 'custom').
+        n_images: Number of systems to compare.
+    """
+    return ctx.deps.backend.cross_validate(card, n_images)
 
 
 def summarize_dataset(ctx: RunContext[AgentDeps], run_ids: list[str]) -> dict[str, Any]:
@@ -247,7 +262,7 @@ def full_toolset() -> FunctionToolset[AgentDeps]:
     ts: FunctionToolset[AgentDeps] = FunctionToolset()
     for fn in (simulate_lens_batch, train_classifier, train_anomaly_detector):
         ts.add_function(fn, requires_approval=True)
-    for fn in (summarize_dataset, evaluate_model, sample_uncertainty, generate_report, list_runs, list_models):
+    for fn in (summarize_dataset, cross_backend_validate, evaluate_model, sample_uncertainty, generate_report, list_runs, list_models):
         ts.add_function(fn)
     return ts
 
