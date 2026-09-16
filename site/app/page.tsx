@@ -1,9 +1,10 @@
+import { Embed } from "@/components/embed";
 import { MediaSlot } from "@/components/media-slot";
 import { Rail } from "@/components/nav";
 import { VideoSlot } from "@/components/video-slot";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
-import { benchTable, crossTable, decisions, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
+import { benchTable, crossTable, decisions, embeds, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
 
 export default function Page() {
   return (
@@ -102,6 +103,14 @@ export default function Page() {
           <div className="my-10">
             <LoopDiagram />
           </div>
+          <Sub>Try the simulator</Sub>
+          <Prose>
+            <p>
+              The same engine the agent drives. Switch to the vortex class and slide the axion mass down: the vortex line stretches across
+              the image and its perturbation of the arcs fades. That region is where the classifier turned out to be weakest.
+            </p>
+          </Prose>
+          <Embed src={embeds.playground} title="Simulate a lens" height={620} caption="Runs on Modal; each render is about 50 ms once the container is warm." />
         </Section>
 
         {/* --------------------------------------------------------- decisions */}
@@ -259,6 +268,14 @@ export default function Page() {
             alt="Bar chart of mean uncertainty per region of parameter space"
             caption="Where the base classifier is weakest. The lightest axions produce vortex lines two to three arcseconds long; the same mass spread along a longer line perturbs the arcs less. Accuracy in that cell: 29%."
           />
+          <Sub>Explore it yourself</Sub>
+          <Prose>
+            <p>
+              The same analysis, live on the 3,000 held-out scores. Pick a class and an axis, change the binning, and click a bar to see the
+              most uncertain images in that cell.
+            </p>
+          </Prose>
+          <Embed src={embeds.explorer} title="Where is the classifier weak?" height={760} caption="Runs entirely in your browser; the first load takes a few seconds." />
 
           <Sub>The loop, with a control</Sub>
           <Prose>
@@ -286,6 +303,7 @@ export default function Page() {
             </p>
           </Prose>
           <Table head={["Arm", "pass", "mean requests", "mean tokens", "mean time", "AUC reached per trial"]} rows={benchTable.map((r) => [r.arm, r.pass, r.req, r.tok, r.time, r.auc])} />
+          <Embed src={embeds.passk} title="pass@k" height={430} caption="How much three trials can tell you: move the sliders to see the estimators at other sample sizes." />
           <Figure src="/figures/bench_cost.png" alt="Bar charts of requests, tokens and wall time per arm" caption="Mean cost per trial. Kimi K3 completes the task either way; the tools change what it costs and whether the result is reproducible." />
           <MediaSlot kind="screenshot" file="shot-bench-sandbox.png" alt="The core arm's sandbox directory full of scripts it wrote" caption="What the core arm left behind: its own simulator, trainer, and diagnostic scripts." />
           <Prose>

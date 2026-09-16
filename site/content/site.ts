@@ -1,5 +1,13 @@
 export const REPO = "https://github.com/amanibobo/lensgrav";
 
+// Interactive marimo apps. The two WASM exports are served from /marimo/... on this site; the
+// playground needs the simulator and runs on Modal (set after `modal deploy`).
+export const embeds = {
+  explorer: "/marimo/uncertainty/index.html",
+  passk: "/marimo/passk/index.html",
+  playground: process.env.NEXT_PUBLIC_PLAYGROUND_URL ?? "https://amanibobo1--lenscraft-playground-playground.modal.run",
+};
+
 export const papers = {
   heptapod: { title: "HEPTAPOD: Orchestrating High Energy Physics Workflows Towards Autonomous Agency", authors: "Menzo, Roman, Gleyzer, Matchev, Fleming, Höche, Mrenna, Shyamsundar", year: "2026", href: "https://arxiv.org/pdf/2512.15867" },
   morphology: { title: "Deep Learning the Morphology of Dark Matter Substructure", authors: "Alexander, Gleyzer, McDonough, Toomey, Usai", year: "2019", href: "https://arxiv.org/pdf/1909.07346" },

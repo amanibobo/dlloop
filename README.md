@@ -21,6 +21,28 @@ design. This README tracks what is actually built.
 architecture diagrams, the build log, results, demo videos, how to reproduce). `cd site && npm
 install && npm run dev`, or deploy to Vercel with the root directory set to `site`.
 
+### Interactive notebooks (marimo)
+
+[`notebooks/`](notebooks/) holds three marimo apps embedded in the site:
+
+| Notebook | Where it runs | Embed |
+|---|---|---|
+| `uncertainty_explorer.py` | in the browser (WASM), on the bundled held-out scores in `notebooks/data/` | Results section |
+| `pass_at_k.py` | in the browser (WASM) | Results, benchmark |
+| `playground.py` | on Modal (`modal deploy -m lenscraft.compute.modal_playground`), it needs lenstronomy | Idea section |
+
+Re-export the browser ones after editing:
+
+```sh
+uv run marimo export html-wasm notebooks/uncertainty_explorer.py -o site/public/marimo/uncertainty --mode run --no-show-code
+uv run marimo export html-wasm notebooks/pass_at_k.py -o site/public/marimo/passk --mode run --no-show-code
+cp notebooks/data/*.json site/public/marimo/uncertainty/data/
+# the two exports share identical assets; keep one copy:
+sed -i '' 's#\./assets/#../uncertainty/assets/#g' site/public/marimo/passk/index.html && rm -rf site/public/marimo/passk/assets
+```
+
+To edit one live: `uv run marimo edit notebooks/playground.py`.
+
 ## Setup
 
 ```sh

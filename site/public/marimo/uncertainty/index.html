@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>Where is the classifier weak?</title>
+    <script type="module" crossorigin src="./assets/index-4n22QjCD.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-CBDbhulC.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-CYIjoINj.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-xfs0Sn4r.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-BQrReHnR.js">
+    <link rel="modulepreload" crossorigin href="./assets/schemas-aTUejmFi.js">
+    <link rel="modulepreload" crossorigin href="./assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="./assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/_initCloneObject-CM3WilQg.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseMerge-DLqSVasz.js">
+    <link rel="modulepreload" crossorigin href="./assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-92uWqz-P.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-D5Ywm7-q.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-BDbGiS7O.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="./assets/session-Sz5nSFku.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-BlNM0caL.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="./assets/fullscreen-BH2jz-F4.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DzCQtGkt.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-BSRA2YI9.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-Dh8EwhsF.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-CA-2mBs3.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-B7HeEoG2.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-BoA6XBpj.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-Do8M9TDF.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-DHJ9s6Vk.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-nLt2y0Sw.js">
+    <link rel="modulepreload" crossorigin href="./assets/circle-ByJdIf5p.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BUtPzKB4.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BtC9ym6k.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CZNULd6Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-D8kPgMKr.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-B_XmHROl.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DiYjQAhI.js">
+    <link rel="modulepreload" crossorigin href="./assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="./assets/strings-CReV1AYG.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-C6_IaFh7.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B8pdsUrS.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-BUaJcygz.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-hGYJX0Ha.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-CloO6gbw.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-Bc-r3jsC.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-DgpSQhrP.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-DEbY281O.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-DpWHUGuF.js">
+    <link rel="modulepreload" crossorigin href="./assets/write-secret-modal-D6zoZgLY.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-C4J9gIE1.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-D_HX-0qx.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-BSgtkC2e.js">
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DkPPv0FB.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Dw9YRsCU.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B0RXffUm.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Cx4BE7jC.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CKUpxYGQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-Dc5bKD4z.js">
+    <link rel="modulepreload" crossorigin href="./assets/paths-zcL04qUW.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-C-ri8BtY.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-Buhk-UgR.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DrVcFY1Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-Cp-G34Rz.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasPath-BmRQipI0.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-yw4sIeJR.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-gX6o3Pih.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-Bs4cJfJU.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-DzO-nXy-.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-DjXr9Y9D.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-BMXKNElG.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-CFuPxa9F.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-DlEomWzI.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-CvVTau-c.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-BHMOvJzM.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-DdB_uBif.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-DpIyjHqY.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-LboTfNDv.js">
+    <link rel="modulepreload" crossorigin href="./assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CRg4xQWg.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-BZKlbm2Q.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-z8fuTE3w.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-CX7oW5zy.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-DwhMAd9l.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-B2d_dHwI.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-CPtBiNgr.js">
+    <link rel="modulepreload" crossorigin href="./assets/events-CbeVJ6OD.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-Di9TbuV9.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-CDVGFYfr.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-B-r81uZ6.js">
+    <link rel="modulepreload" crossorigin href="./assets/tabs-Cy1qXLzH.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-CKA5zVsM.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-C40jM9o4.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-D6GUC5q6.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-DMxOzI7b.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-CUK1W5bI.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-Bf-rx_aV.js">
+    <link rel="modulepreload" crossorigin href="./assets/tree-actions-CG5g7aUQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/ellipsis-Dfik_tuW.js">
+    <link rel="modulepreload" crossorigin href="./assets/external-link-Bp3BxyRA.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-Ck-Hgfvj.js">
+    <link rel="modulepreload" crossorigin href="./assets/message-circle-BQB1AIAg.js">
+    <link rel="modulepreload" crossorigin href="./assets/hat-glasses-C8LSY3HT.js">
+    <link rel="modulepreload" crossorigin href="./assets/package-DPlscLzt.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-DrODSIs0.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-Cwh96ZBE.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dmKwNsrp.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-DsD08SLK.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-B6AklCzD.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-6burT2XF.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-DqpoYOvw.js">
+    <link rel="modulepreload" crossorigin href="./assets/VisuallyHidden-CBMDmozt.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-BiqAQ-zI.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-yTIMUO13.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-nQ3Iam8J.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-B58T85Jq.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-Dm4DaIgg.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-AQmjV9CX.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BG35uS_N.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-icons.esm-hr79-MCS.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-nLO-SoUf.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-C7Di8f2y.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-Dw5YY9wq.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-49LGK4zG.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-C6s96nu2.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DmqOOjfe.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-BSRAHC4P.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-CzIGPEZQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-ChZdjJhj.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-DkZweMAs.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-DKsAmLTi.js">
+    <link rel="modulepreload" crossorigin href="./assets/semaphore-BjoL5P0h.js">
+    <link rel="modulepreload" crossorigin href="./assets/fileToBase64-NhpNrK5l.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-BXC4CItZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-B7x62Eeh.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-headphone-rFCxFRI8.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-DF8n85RA.js">
+    <link rel="modulepreload" crossorigin href="./assets/image-ab13yGv4.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-icons-DdGYuADJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/globe-BQf75qV_.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-export-0rLbaq8b.js">
+    <link rel="modulepreload" crossorigin href="./assets/data-grid-types-DgHVN_Zz.js">
+    <link rel="modulepreload" crossorigin href="./assets/glide-utils-UGsrRHYj.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-riSXbYe_.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-B58Ib8Ir.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-MihykDYG.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-Djf4O40e.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-CrFhA96G.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-X-CJUSM8.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-DzY74mzC.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-CjLa9BiH.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-CLytDdMl.js">
+    <link rel="modulepreload" crossorigin href="./assets/pathUtils-Cryrlpma.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DaUHnl_e.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-D-c15Ks-.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-B7zTpxjS.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-C7yAojRA.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "import marimo\n\n__generated_with = \"0.24.2\"\napp = marimo.App(width=\"medium\", app_title=\"Where is the classifier weak?\")\n\n\n@app.cell\ndef _():\n    import io\n    import json\n    import sys\n\n    import altair as alt\n    import marimo as mo\n    import numpy as np\n    import pandas as pd\n\n    return alt, io, json, mo, np, pd, sys\n\n\n@app.cell\ndef _(json, mo, np, sys):\n    # Data sits next to the notebook (data/...). mo.notebook_location() is a directory locally and\n    # a URL in the browser build, where the files are fetched synchronously.\n    def _load_text(name: str) -\u003E str:\n        loc = mo.notebook_location()\n        if \"pyodide\" in sys.modules:\n            from pyodide.http import open_url\n\n            return open_url(f\"{str(loc).rstrip('/')}/data/{name}\").read()\n        return (loc / \"data\" / name).read_text()\n\n    scores = json.loads(_load_text(\"scores_clf_base_b.json\"))\n    _imgs = json.loads(_load_text(\"images_te1k.json\"))\n    import base64\n\n    images = {k: np.frombuffer(base64.b64decode(v), dtype=np.uint8).reshape(64, 64) for k, v in _imgs.items()}\n    return images, scores\n\n\n@app.cell\ndef _(np, pd, scores):\n    CLASSES = [\"none\", \"subhalo\", \"vortex\"]\n    rows = []\n    for im in scores[\"images\"]:\n        li = CLASSES.index(im[\"label\"])\n        rows.append(\n            {\n                \"image_id\": im[\"image_id\"],\n                \"label\": im[\"label\"],\n                \"pred\": im[\"pred\"],\n                \"p_none\": im[\"probs\"][0],\n                \"p_subhalo\": im[\"probs\"][1],\n                \"p_vortex\": im[\"probs\"][2],\n                \"uncertainty\": 1.0 - im[\"probs\"][li],\n                \"correct\": im[\"pred\"] == im[\"label\"],\n                \"snr\": im[\"snr\"],\n                \"mass_fraction\": im[\"mass_fraction\"],\n                \"axion_mass\": im[\"axion_mass\"] if im[\"axion_mass\"] is not None else np.nan,\n                \"n_subhalos\": im[\"n_subhalos\"] if im[\"n_subhalos\"] is not None else np.nan,\n            }\n        )\n    df = pd.DataFrame(rows)\n    AXES = {\"none\": [\"snr\"], \"subhalo\": [\"n_subhalos\", \"snr\"], \"vortex\": [\"axion_mass\", \"snr\"]}\n    return AXES, df\n\n\n@app.cell\ndef _(mo):\n    cls = mo.ui.dropdown(options=[\"vortex\", \"subhalo\", \"none\"], value=\"vortex\", label=\"class\")\n    n_bins = mo.ui.slider(2, 8, value=4, label=\"bins\")\n    return cls, n_bins\n\n\n@app.cell\ndef _(AXES, cls, mo):\n    axis = mo.ui.dropdown(options=AXES[cls.value], value=AXES[cls.value][0], label=\"axis\")\n    return (axis,)\n\n\n@app.cell\ndef _(axis, cls, mo, n_bins, scores):\n    mo.md(\n        f\"\"\"\n    **{scores['model_id']}** on {sum(1 for _ in scores['images']):,} held-out images. Per-image uncertainty is\n    1 \u2212 P(true class). Pick a class and an axis; bins are quantiles. Click a bar to see images from that cell.\n\n    {mo.hstack([cls, axis, n_bins], gap=2, justify=\"start\")}\n    \"\"\"\n    )\n    return\n\n\n@app.cell\ndef _(alt, axis, cls, df, mo, n_bins, np):\n    sub = df[(df[\"label\"] == cls.value) \u0026 df[axis.value].notna()].copy()\n    log = axis.value == \"axion_mass\"\n    v = np.log10(sub[axis.value]) if log else sub[axis.value]\n    edges = np.unique(np.quantile(v, np.linspace(0, 1, n_bins.value + 1)))\n    which = np.clip(np.searchsorted(edges, v, side=\"right\") - 1, 0, len(edges) - 2)\n    sub[\"bin\"] = which\n    cells = (\n        sub.groupby(\"bin\")\n        .agg(n=(\"uncertainty\", \"size\"), uncertainty=(\"uncertainty\", \"mean\"), accuracy=(\"correct\", \"mean\"))\n        .reset_index()\n    )\n    lo = edges[cells[\"bin\"]]\n    hi = edges[cells[\"bin\"] + 1]\n    if log:\n        lo, hi = 10**lo, 10**hi\n    cells[\"range\"] = [f\"{a:.3g} to {b:.3g}\" for a, b in zip(lo, hi)]\n    cells[\"cell\"] = [f\"{axis.value} {r}\" for r in cells[\"range\"]]\n    color = {\"none\": \"#2a78d6\", \"subhalo\": \"#eb6834\", \"vortex\": \"#1baf7a\"}[cls.value]\n    cells[\"label\"] = [f\"{r}  |  accuracy {a:.0%}  |  n={int(k)}\" for r, a, k in zip(cells[\"range\"], cells[\"accuracy\"], cells[\"n\"])]\n    # no cornerRadiusEnd: inside mo.ui.altair_chart it makes the bars disappear (marimo 0.24)\n    bars = (\n        alt.Chart(cells)\n        .mark_bar(color=color)\n        .encode(\n            y=alt.Y(\"label:N\", sort=alt.EncodingSortField(\"bin\"), title=None, axis=alt.Axis(labelLimit=320, labelFontSize=11)),\n            x=alt.X(\"uncertainty:Q\", scale=alt.Scale(domain=[0, 1]), title=\"mean uncertainty (1 - P(true class))\"),\n            tooltip=[\"range:N\", \"n:Q\", alt.Tooltip(\"uncertainty:Q\", format=\".3f\"), alt.Tooltip(\"accuracy:Q\", format=\".3f\")],\n        )\n        .properties(height=32 * len(cells) + 20, width=\"container\")\n    )\n    chart = mo.ui.altair_chart(bars, chart_selection=\"point\", legend_selection=False)\n    weakest = cells.sort_values(\"uncertainty\", ascending=False).iloc[0]\n    return chart, sub, weakest\n\n\n@app.cell\ndef _(chart, mo, weakest):\n    mo.vstack(\n        [\n            chart,\n            mo.md(\n                f\"Weakest: **{weakest['cell']}** (n = {int(weakest['n'])}, mean uncertainty {weakest['uncertainty']:.2f}, \"\n                f\"accuracy {weakest['accuracy']:.0%}). Labels on the bars are accuracy per bin.\"\n            ),\n        ]\n    )\n    return\n\n\n@app.cell\ndef _(chart, images, io, mo, sub):\n    from PIL import Image\n\n    def _png(arr) -\u003E bytes:\n        buf = io.BytesIO()\n        Image.fromarray(arr).resize((128, 128), Image.NEAREST).save(buf, format=\"PNG\")\n        return buf.getvalue()\n\n    picked = chart.value\n    if picked is None or len(picked) == 0:\n        _out = mo.md(\"*Click a bar to see sample images from that cell.*\")\n    else:\n        bins = set(int(b) for b in picked[\"bin\"].tolist())\n        _rows = sub[sub[\"bin\"].isin(bins) \u0026 sub[\"image_id\"].isin(images.keys())].sort_values(\"uncertainty\", ascending=False).head(12)\n        if len(_rows) == 0:\n            _out = mo.md(\"*No bundled images in this cell (the page ships 200 per class).*\")\n        else:\n            tiles = [\n                mo.vstack(\n                    [\n                        mo.image(src=_png(images[r[\"image_id\"]]), width=110),\n                        mo.md(f\"\u003Cspan style='font-size:11px;white-space:nowrap;color:{'#111' if r['correct'] else '#d03b3b'}'\u003E{r['pred']} {r['uncertainty']:.2f}\u003C/span\u003E\"),\n                    ],\n                    gap=0.2,\n                )\n                for _, r in _rows.iterrows()\n            ]\n            _out = mo.vstack([mo.md(\"Most uncertain images in the selected cell (red = misclassified):\"), mo.hstack(tiles, wrap=True, gap=0.8, justify=\"start\")])\n    _out\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.24.2%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22%2C%20app_title%3D%22Where%20is%20the%20classifier%20weak%3F%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20io%0A%20%20%20%20import%20json%0A%20%20%20%20import%20sys%0A%0A%20%20%20%20import%20altair%20as%20alt%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20numpy%20as%20np%0A%20%20%20%20import%20pandas%20as%20pd%0A%0A%20%20%20%20return%20alt%2C%20io%2C%20json%2C%20mo%2C%20np%2C%20pd%2C%20sys%0A%0A%0A%40app.cell%0Adef%20_(json%2C%20mo%2C%20np%2C%20sys)%3A%0A%20%20%20%20%23%20Data%20sits%20next%20to%20the%20notebook%20(data%2F...).%20mo.notebook_location()%20is%20a%20directory%20locally%20and%0A%20%20%20%20%23%20a%20URL%20in%20the%20browser%20build%2C%20where%20the%20files%20are%20fetched%20synchronously.%0A%20%20%20%20def%20_load_text(name%3A%20str)%20-%3E%20str%3A%0A%20%20%20%20%20%20%20%20loc%20%3D%20mo.notebook_location()%0A%20%20%20%20%20%20%20%20if%20%22pyodide%22%20in%20sys.modules%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20from%20pyodide.http%20import%20open_url%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20open_url(f%22%7Bstr(loc).rstrip('%2F')%7D%2Fdata%2F%7Bname%7D%22).read()%0A%20%20%20%20%20%20%20%20return%20(loc%20%2F%20%22data%22%20%2F%20name).read_text()%0A%0A%20%20%20%20scores%20%3D%20json.loads(_load_text(%22scores_clf_base_b.json%22))%0A%20%20%20%20_imgs%20%3D%20json.loads(_load_text(%22images_te1k.json%22))%0A%20%20%20%20import%20base64%0A%0A%20%20%20%20images%20%3D%20%7Bk%3A%20np.frombuffer(base64.b64decode(v)%2C%20dtype%3Dnp.uint8).reshape(64%2C%2064)%20for%20k%2C%20v%20in%20_imgs.items()%7D%0A%20%20%20%20return%20images%2C%20scores%0A%0A%0A%40app.cell%0Adef%20_(np%2C%20pd%2C%20scores)%3A%0A%20%20%20%20CLASSES%20%3D%20%5B%22none%22%2C%20%22subhalo%22%2C%20%22vortex%22%5D%0A%20%20%20%20rows%20%3D%20%5B%5D%0A%20%20%20%20for%20im%20in%20scores%5B%22images%22%5D%3A%0A%20%20%20%20%20%20%20%20li%20%3D%20CLASSES.index(im%5B%22label%22%5D)%0A%20%20%20%20%20%20%20%20rows.append(%0A%20%20%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22image_id%22%3A%20im%5B%22image_id%22%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22label%22%3A%20im%5B%22label%22%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22pred%22%3A%20im%5B%22pred%22%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22p_none%22%3A%20im%5B%22probs%22%5D%5B0%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22p_subhalo%22%3A%20im%5B%22probs%22%5D%5B1%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22p_vortex%22%3A%20im%5B%22probs%22%5D%5B2%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22uncertainty%22%3A%201.0%20-%20im%5B%22probs%22%5D%5Bli%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22correct%22%3A%20im%5B%22pred%22%5D%20%3D%3D%20im%5B%22label%22%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22snr%22%3A%20im%5B%22snr%22%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22mass_fraction%22%3A%20im%5B%22mass_fraction%22%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22axion_mass%22%3A%20im%5B%22axion_mass%22%5D%20if%20im%5B%22axion_mass%22%5D%20is%20not%20None%20else%20np.nan%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22n_subhalos%22%3A%20im%5B%22n_subhalos%22%5D%20if%20im%5B%22n_subhalos%22%5D%20is%20not%20None%20else%20np.nan%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20df%20%3D%20pd.DataFrame(rows)%0A%20%20%20%20AXES%20%3D%20%7B%22none%22%3A%20%5B%22snr%22%5D%2C%20%22subhalo%22%3A%20%5B%22n_subhalos%22%2C%20%22snr%22%5D%2C%20%22vortex%22%3A%20%5B%22axion_mass%22%2C%20%22snr%22%5D%7D%0A%20%20%20%20return%20AXES%2C%20df%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20cls%20%3D%20mo.ui.dropdown(options%3D%5B%22vortex%22%2C%20%22subhalo%22%2C%20%22none%22%5D%2C%20value%3D%22vortex%22%2C%20label%3D%22class%22)%0A%20%20%20%20n_bins%20%3D%20mo.ui.slider(2%2C%208%2C%20value%3D4%2C%20label%3D%22bins%22)%0A%20%20%20%20return%20cls%2C%20n_bins%0A%0A%0A%40app.cell%0Adef%20_(AXES%2C%20cls%2C%20mo)%3A%0A%20%20%20%20axis%20%3D%20mo.ui.dropdown(options%3DAXES%5Bcls.value%5D%2C%20value%3DAXES%5Bcls.value%5D%5B0%5D%2C%20label%3D%22axis%22)%0A%20%20%20%20return%20(axis%2C)%0A%0A%0A%40app.cell%0Adef%20_(axis%2C%20cls%2C%20mo%2C%20n_bins%2C%20scores)%3A%0A%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20**%7Bscores%5B'model_id'%5D%7D**%20on%20%7Bsum(1%20for%20_%20in%20scores%5B'images'%5D)%3A%2C%7D%20held-out%20images.%20Per-image%20uncertainty%20is%0A%20%20%20%201%20%E2%88%92%20P(true%20class).%20Pick%20a%20class%20and%20an%20axis%3B%20bins%20are%20quantiles.%20Click%20a%20bar%20to%20see%20images%20from%20that%20cell.%0A%0A%20%20%20%20%7Bmo.hstack(%5Bcls%2C%20axis%2C%20n_bins%5D%2C%20gap%3D2%2C%20justify%3D%22start%22)%7D%0A%20%20%20%20%22%22%22%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(alt%2C%20axis%2C%20cls%2C%20df%2C%20mo%2C%20n_bins%2C%20np)%3A%0A%20%20%20%20sub%20%3D%20df%5B(df%5B%22label%22%5D%20%3D%3D%20cls.value)%20%26%20df%5Baxis.value%5D.notna()%5D.copy()%0A%20%20%20%20log%20%3D%20axis.value%20%3D%3D%20%22axion_mass%22%0A%20%20%20%20v%20%3D%20np.log10(sub%5Baxis.value%5D)%20if%20log%20else%20sub%5Baxis.value%5D%0A%20%20%20%20edges%20%3D%20np.unique(np.quantile(v%2C%20np.linspace(0%2C%201%2C%20n_bins.value%20%2B%201)))%0A%20%20%20%20which%20%3D%20np.clip(np.searchsorted(edges%2C%20v%2C%20side%3D%22right%22)%20-%201%2C%200%2C%20len(edges)%20-%202)%0A%20%20%20%20sub%5B%22bin%22%5D%20%3D%20which%0A%20%20%20%20cells%20%3D%20(%0A%20%20%20%20%20%20%20%20sub.groupby(%22bin%22)%0A%20%20%20%20%20%20%20%20.agg(n%3D(%22uncertainty%22%2C%20%22size%22)%2C%20uncertainty%3D(%22uncertainty%22%2C%20%22mean%22)%2C%20accuracy%3D(%22correct%22%2C%20%22mean%22))%0A%20%20%20%20%20%20%20%20.reset_index()%0A%20%20%20%20)%0A%20%20%20%20lo%20%3D%20edges%5Bcells%5B%22bin%22%5D%5D%0A%20%20%20%20hi%20%3D%20edges%5Bcells%5B%22bin%22%5D%20%2B%201%5D%0A%20%20%20%20if%20log%3A%0A%20%20%20%20%20%20%20%20lo%2C%20hi%20%3D%2010**lo%2C%2010**hi%0A%20%20%20%20cells%5B%22range%22%5D%20%3D%20%5Bf%22%7Ba%3A.3g%7D%20to%20%7Bb%3A.3g%7D%22%20for%20a%2C%20b%20in%20zip(lo%2C%20hi)%5D%0A%20%20%20%20cells%5B%22cell%22%5D%20%3D%20%5Bf%22%7Baxis.value%7D%20%7Br%7D%22%20for%20r%20in%20cells%5B%22range%22%5D%5D%0A%20%20%20%20color%20%3D%20%7B%22none%22%3A%20%22%232a78d6%22%2C%20%22subhalo%22%3A%20%22%23eb6834%22%2C%20%22vortex%22%3A%20%22%231baf7a%22%7D%5Bcls.value%5D%0A%20%20%20%20cells%5B%22label%22%5D%20%3D%20%5Bf%22%7Br%7D%20%20%7C%20%20accuracy%20%7Ba%3A.0%25%7D%20%20%7C%20%20n%3D%7Bint(k)%7D%22%20for%20r%2C%20a%2C%20k%20in%20zip(cells%5B%22range%22%5D%2C%20cells%5B%22accuracy%22%5D%2C%20cells%5B%22n%22%5D)%5D%0A%20%20%20%20%23%20no%20cornerRadiusEnd%3A%20inside%20mo.ui.altair_chart%20it%20makes%20the%20bars%20disappear%20(marimo%200.24)%0A%20%20%20%20bars%20%3D%20(%0A%20%20%20%20%20%20%20%20alt.Chart(cells)%0A%20%20%20%20%20%20%20%20.mark_bar(color%3Dcolor)%0A%20%20%20%20%20%20%20%20.encode(%0A%20%20%20%20%20%20%20%20%20%20%20%20y%3Dalt.Y(%22label%3AN%22%2C%20sort%3Dalt.EncodingSortField(%22bin%22)%2C%20title%3DNone%2C%20axis%3Dalt.Axis(labelLimit%3D320%2C%20labelFontSize%3D11))%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20x%3Dalt.X(%22uncertainty%3AQ%22%2C%20scale%3Dalt.Scale(domain%3D%5B0%2C%201%5D)%2C%20title%3D%22mean%20uncertainty%20(1%20-%20P(true%20class))%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20tooltip%3D%5B%22range%3AN%22%2C%20%22n%3AQ%22%2C%20alt.Tooltip(%22uncertainty%3AQ%22%2C%20format%3D%22.3f%22)%2C%20alt.Tooltip(%22accuracy%3AQ%22%2C%20format%3D%22.3f%22)%5D%2C%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20.properties(height%3D32%20*%20len(cells)%20%2B%2020%2C%20width%3D%22container%22)%0A%20%20%20%20)%0A%20%20%20%20chart%20%3D%20mo.ui.altair_chart(bars%2C%20chart_selection%3D%22point%22%2C%20legend_selection%3DFalse)%0A%20%20%20%20weakest%20%3D%20cells.sort_values(%22uncertainty%22%2C%20ascending%3DFalse).iloc%5B0%5D%0A%20%20%20%20return%20chart%2C%20sub%2C%20weakest%0A%0A%0A%40app.cell%0Adef%20_(chart%2C%20mo%2C%20weakest)%3A%0A%20%20%20%20mo.vstack(%0A%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20chart%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22Weakest%3A%20**%7Bweakest%5B'cell'%5D%7D**%20(n%20%3D%20%7Bint(weakest%5B'n'%5D)%7D%2C%20mean%20uncertainty%20%7Bweakest%5B'uncertainty'%5D%3A.2f%7D%2C%20%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20f%22accuracy%20%7Bweakest%5B'accuracy'%5D%3A.0%25%7D).%20Labels%20on%20the%20bars%20are%20accuracy%20per%20bin.%22%0A%20%20%20%20%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(chart%2C%20images%2C%20io%2C%20mo%2C%20sub)%3A%0A%20%20%20%20from%20PIL%20import%20Image%0A%0A%20%20%20%20def%20_png(arr)%20-%3E%20bytes%3A%0A%20%20%20%20%20%20%20%20buf%20%3D%20io.BytesIO()%0A%20%20%20%20%20%20%20%20Image.fromarray(arr).resize((128%2C%20128)%2C%20Image.NEAREST).save(buf%2C%20format%3D%22PNG%22)%0A%20%20%20%20%20%20%20%20return%20buf.getvalue()%0A%0A%20%20%20%20picked%20%3D%20chart.value%0A%20%20%20%20if%20picked%20is%20None%20or%20len(picked)%20%3D%3D%200%3A%0A%20%20%20%20%20%20%20%20_out%20%3D%20mo.md(%22*Click%20a%20bar%20to%20see%20sample%20images%20from%20that%20cell.*%22)%0A%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20bins%20%3D%20set(int(b)%20for%20b%20in%20picked%5B%22bin%22%5D.tolist())%0A%20%20%20%20%20%20%20%20_rows%20%3D%20sub%5Bsub%5B%22bin%22%5D.isin(bins)%20%26%20sub%5B%22image_id%22%5D.isin(images.keys())%5D.sort_values(%22uncertainty%22%2C%20ascending%3DFalse).head(12)%0A%20%20%20%20%20%20%20%20if%20len(_rows)%20%3D%3D%200%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20_out%20%3D%20mo.md(%22*No%20bundled%20images%20in%20this%20cell%20(the%20page%20ships%20200%20per%20class).*%22)%0A%20%20%20%20%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20tiles%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mo.vstack(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mo.image(src%3D_png(images%5Br%5B%22image_id%22%5D%5D)%2C%20width%3D110)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mo.md(f%22%3Cspan%20style%3D'font-size%3A11px%3Bwhite-space%3Anowrap%3Bcolor%3A%7B'%23111'%20if%20r%5B'correct'%5D%20else%20'%23d03b3b'%7D'%3E%7Br%5B'pred'%5D%7D%20%7Br%5B'uncertainty'%5D%3A.2f%7D%3C%2Fspan%3E%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gap%3D0.2%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20for%20_%2C%20r%20in%20_rows.iterrows()%0A%20%20%20%20%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20_out%20%3D%20mo.vstack(%5Bmo.md(%22Most%20uncertain%20images%20in%20the%20selected%20cell%20(red%20%3D%20misclassified)%3A%22)%2C%20mo.hstack(tiles%2C%20wrap%3DTrue%2C%20gap%3D0.8%2C%20justify%3D%22start%22)%5D)%0A%20%20%20%20_out%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.24.2",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "pip"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"app_title": "Where is the classifier weak?", "sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>
