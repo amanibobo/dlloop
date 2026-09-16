@@ -7,11 +7,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "LensCraft",
+  title: "Dark Matter by Feedback: Uncertainty-Driven Simulation for Strong-Lensing Detectors",
   description:
     "An agent that simulates gravitational lenses, trains dark-matter substructure detectors on them, and uses what the models can't classify to decide what to simulate next.",
   openGraph: {
-    title: "LensCraft",
+    title: "Dark Matter by Feedback: Uncertainty-Driven Simulation for Strong-Lensing Detectors",
     description: "Closing the simulate-train-resimulate loop. A case study built on Pydantic AI, Lenstronomy and Modal.",
     images: ["/figures/hero_classes.png"],
   },

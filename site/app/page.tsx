@@ -14,8 +14,14 @@ export default function Page() {
       <main className="flex-1">
         {/* ------------------------------------------------------------- hero */}
         <section className="mx-auto w-full max-w-195 px-6 pb-6 pt-20 sm:pt-28">
-          <h1 className="text-[2rem] font-semibold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[2.25rem]">LensCraft</h1>
-          <p className="mt-3 text-[1.1rem] leading-snug text-ink-2 sm:text-[1.2rem]">
+          <p className="kicker">LensCraft · case study</p>
+          <h1 className="mt-3 text-[2rem] font-semibold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[2.25rem]">
+            Dark Matter by Feedback
+            <span className="mt-1.5 block text-[1.35rem] font-medium leading-[1.25] text-ink-2 sm:text-[1.5rem]">
+              Uncertainty-Driven Simulation for Strong-Lensing Detectors
+            </span>
+          </h1>
+          <p className="mt-5 text-[1.05rem] leading-snug text-ink-2 sm:text-[1.1rem]">
             An agent that simulates gravitational lenses, trains dark-matter detectors on them, and decides what to simulate next
           </p>
           <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
