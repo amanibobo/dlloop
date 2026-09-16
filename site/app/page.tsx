@@ -1,26 +1,26 @@
-import { Nav } from "@/components/nav";
+import { Rail } from "@/components/nav";
 import { VideoSlot } from "@/components/video-slot";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
-import { benchTable, crossTable, decisions, loopTable, phases, REPO, reproduce, videos } from "@/content/site";
+import { benchTable, crossTable, decisions, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
 
 export default function Page() {
   return (
     <>
       <a id="top" />
-      <Nav />
+      <Rail />
       <main className="flex-1">
         {/* ------------------------------------------------------------- hero */}
-        <section className="mx-auto w-full max-w-[840px] px-6 pb-8 pt-20 sm:pt-28">
-          <h1 className="text-[2.4rem] font-semibold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[2.75rem]">LensCraft</h1>
-          <p className="mt-4 text-[1.3rem] leading-snug text-ink-2 sm:text-[1.45rem]">
+        <section className="mx-auto w-full max-w-195 px-6 pb-6 pt-20 sm:pt-28">
+          <h1 className="text-[2rem] font-semibold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[2.25rem]">LensCraft</h1>
+          <p className="mt-3 text-[1.1rem] leading-snug text-ink-2 sm:text-[1.2rem]">
             An agent that simulates gravitational lenses, trains dark-matter detectors on them, and decides what to simulate next
           </p>
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-surface">
+          <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
             {/* eslint-disable-next-line @next/next/no-img-element -- static hero from the simulator */}
             <img src="/figures/hero_classes.png" alt="Three simulated Einstein rings, one per substructure class, and the perturbation each substructure adds" className="h-auto w-full" />
           </div>
-          <div className="mt-12">
+          <div className="mt-10">
             <Meta
               items={[
                 { label: "Role", lines: ["Design and build", "solo, with an AI pair"] },
@@ -67,12 +67,21 @@ export default function Page() {
             </p>
             <p>
               Both signatures are subtle and real strong lenses are rare, so the only way to train a detector is to simulate: thousands of
-              images per hypothesis, across every plausible halo mass, redshift, mass fraction and axion mass. Alexander et al. (2019)
-              classified such simulations with ResNet-18 and AlexNet; Alexander et al. (2021) did it without labels using autoencoders.
-              Both spent most of their effort generating and curating simulations by hand.
+              images per hypothesis, across every plausible halo mass, redshift, mass fraction and axion mass.{" "}
+              <a href={papers.morphology.href} target="_blank" rel="noreferrer">
+                Alexander et al. (2019)
+              </a>{" "}
+              classified such simulations with ResNet-18 and AlexNet;{" "}
+              <a href={papers.decoding.href} target="_blank" rel="noreferrer">
+                Alexander et al. (2021)
+              </a>{" "}
+              did it without labels using autoencoders. Both spent most of their effort generating and curating simulations by hand.
             </p>
             <p>
-              HEPTAPOD (Menzo et al., 2026) showed the pattern for high-energy physics: wrap the simulation engines in schema-validated
+              <a href={papers.heptapod.href} target="_blank" rel="noreferrer">
+                HEPTAPOD
+              </a>{" "}
+              (Menzo et al., 2026) showed the pattern for high-energy physics: wrap the simulation engines in schema-validated
               tools, coordinate them with run cards a human signs off on, and let an agent orchestrate. This project applies that pattern
               to lensing and adds the piece it was missing, a feedback signal.
             </p>
@@ -101,8 +110,8 @@ export default function Page() {
           <ol className="mt-10 divide-y divide-line border-t border-line">
             {decisions.map((d) => (
               <li key={d.question} className="py-8">
-                <h3 className="text-[1.2rem] font-semibold tracking-[-0.01em] text-ink">{d.question}</h3>
-                <dl className="mt-4 grid gap-x-8 gap-y-2 text-[1rem] leading-relaxed sm:grid-cols-[6.5rem_1fr]">
+                <h3 className="text-[1.05rem] font-semibold tracking-[-0.01em] text-ink">{d.question}</h3>
+                <dl className="mt-3 grid gap-x-8 gap-y-1.5 text-[0.92rem] leading-relaxed sm:grid-cols-[6.5rem_1fr]">
                   <dt className="kicker">Considered</dt>
                   <dd className="text-ink-2">{d.options}</dd>
                   <dt className="kicker">Chosen</dt>
@@ -181,10 +190,10 @@ export default function Page() {
                 <p className="kicker">
                   Phase {p.n} · {p.when}
                 </p>
-                <h3 className="mt-2 text-[1.35rem] font-semibold tracking-[-0.01em] text-ink">{p.title}</h3>
-                <p className="prose mt-4">{p.delivered}</p>
-                <p className="kicker mt-6">What broke</p>
-                <div className="prose text-[1.02rem]">
+                <h3 className="mt-2 text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">{p.title}</h3>
+                <p className="prose mt-3">{p.delivered}</p>
+                <p className="kicker mt-5">What broke</p>
+                <div className="prose text-[0.95rem]">
                   <ul className="mt-2!">
                     {p.broke.map((b) => (
                       <li key={b.what}>
@@ -331,22 +340,34 @@ export default function Page() {
               </li>
             ))}
           </ol>
-          <div className="mt-12">
+          <div className="mt-10">
             <Prose>
               <p>
                 Source, design document, tests and the generated report are at{" "}
                 <a href={REPO} target="_blank" rel="noreferrer">
                   github.com/amanibobo/lensgrav
                 </a>
-                . References: Menzo et al., <em>HEPTAPOD</em> (2026); Alexander et al., <em>Deep Learning the Morphology of Dark Matter
-                Substructure</em> (2019); Alexander et al., <em>Decoding Dark Matter Substructure without Supervision</em> (2021).
+                .
               </p>
             </Prose>
           </div>
+          <Sub>References</Sub>
+          <ol className="mt-4 divide-y divide-line border-t border-line">
+            {Object.values(papers).map((p) => (
+              <li key={p.href} className="py-3.5 text-[0.95rem] leading-relaxed">
+                <a href={p.href} target="_blank" rel="noreferrer" className="text-ink underline decoration-line underline-offset-4 hover:decoration-ink">
+                  {p.title}
+                </a>
+                <span className="block text-ink-2">
+                  {p.authors}, {p.year}
+                </span>
+              </li>
+            ))}
+          </ol>
         </Section>
       </main>
       <footer className="py-12">
-        <div className="mx-auto max-w-[840px] px-6 text-[0.9rem] text-muted">LensCraft · September 2026 · figures generated by the project&apos;s own report tool</div>
+        <div className="mx-auto max-w-195 px-6 text-[0.82rem] text-muted">LensCraft · September 2026 · figures generated by the project&apos;s own report tool</div>
       </footer>
     </>
   );

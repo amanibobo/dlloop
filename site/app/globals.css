@@ -25,7 +25,7 @@
   --color-none: var(--none);
   --color-subhalo: var(--subhalo);
   --color-vortex: var(--vortex);
-  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-sans-face), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
@@ -42,9 +42,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Body copy: 18px, relaxed, warm grey, as in the reference */
+/* Body copy: ~16px, relaxed, warm grey */
 .prose {
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.65;
   color: var(--ink-2);
 }
@@ -85,7 +85,7 @@ body {
 
 .kicker {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   letter-spacing: 0.02em;
   color: var(--ink-2);
 }

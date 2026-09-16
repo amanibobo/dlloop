@@ -1,5 +1,12 @@
 export const REPO = "https://github.com/amanibobo/lensgrav";
 
+export const papers = {
+  heptapod: { title: "HEPTAPOD: Orchestrating High Energy Physics Workflows Towards Autonomous Agency", authors: "Menzo, Roman, Gleyzer, Matchev, Fleming, Höche, Mrenna, Shyamsundar", year: "2026", href: "https://arxiv.org/pdf/2512.15867" },
+  morphology: { title: "Deep Learning the Morphology of Dark Matter Substructure", authors: "Alexander, Gleyzer, McDonough, Toomey, Usai", year: "2019", href: "https://arxiv.org/pdf/1909.07346" },
+  decoding: { title: "Decoding Dark Matter Substructure without Supervision", authors: "Alexander, Gleyzer, Parul, Reddy, Toomey, Usai, Von Klar", year: "2021", href: "https://arxiv.org/pdf/2008.12731" },
+  deeplensesim: { title: "DeepLenseSim", authors: "Toomey", year: "GitHub", href: "https://github.com/mwt5345/DeepLenseSim" },
+};
+
 export const nav = [
   { id: "overview", label: "Overview" },
   { id: "problem", label: "Problem" },
