@@ -1,8 +1,8 @@
 import { Nav } from "@/components/nav";
 import { VideoSlot } from "@/components/video-slot";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
-import { ClassDot, Code, Details, Figure, Prose, Section, Table } from "@/components/ui";
-import { benchTable, crossTable, decisions, loopTable, phases, REPO, reproduce, stats, videos } from "@/content/site";
+import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
+import { benchTable, crossTable, decisions, loopTable, phases, REPO, reproduce, videos } from "@/content/site";
 
 export default function Page() {
   return (
@@ -10,137 +10,146 @@ export default function Page() {
       <a id="top" />
       <Nav />
       <main className="flex-1">
-        {/* ---------------------------------------------------------------- hero */}
-        <section className="mx-auto w-full max-w-5xl px-5 pb-16 pt-16 sm:px-8 sm:pt-24">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">Case study · September 2026</p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-[1.08] tracking-tight text-ink sm:text-6xl">
-            An agent that decides what to simulate next.
-          </h1>
-          <p className="prose mt-6 text-xl text-ink-2">
-            LensCraft simulates strong gravitational lenses, trains dark-matter substructure detectors on them, and uses what those detectors
-            can&apos;t classify to choose the next batch of simulations. Built on Pydantic AI, Lenstronomy and Modal, with a human approving every
-            expensive step.
+        {/* ------------------------------------------------------------- hero */}
+        <section className="mx-auto w-full max-w-[840px] px-6 pb-8 pt-20 sm:pt-28">
+          <h1 className="text-[2.4rem] font-semibold leading-[1.15] tracking-[-0.02em] text-ink sm:text-[2.75rem]">LensCraft</h1>
+          <p className="mt-4 text-[1.3rem] leading-snug text-ink-2 sm:text-[1.45rem]">
+            An agent that simulates gravitational lenses, trains dark-matter detectors on them, and decides what to simulate next
           </p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="rounded-lg border border-line bg-surface p-5">
-                <div className="text-3xl font-semibold tracking-tight text-ink">{s.value}</div>
-                <div className="mt-1 text-sm font-medium text-ink">{s.label}</div>
-                <div className="mt-1 text-xs leading-relaxed text-ink-2">{s.sub}</div>
-              </div>
-            ))}
+          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-surface">
+            {/* eslint-disable-next-line @next/next/no-img-element -- static hero from the simulator */}
+            <img src="/figures/hero_classes.png" alt="Three simulated Einstein rings, one per substructure class, and the perturbation each substructure adds" className="h-auto w-full" />
           </div>
-          <Figure
-            wide
-            src="/figures/hero_classes.png"
-            alt="Three simulated Einstein rings, one per substructure class, with the perturbation each substructure adds to the arcs"
-            caption="The three classes the models learn to tell apart. Top: the observed image. Bottom: what the substructure adds to the arcs, once the smooth lens is subtracted. CDM subhalos leave a local dent; an axion vortex leaves a coherent distortion along a line."
-          />
+          <div className="mt-12">
+            <Meta
+              items={[
+                { label: "Role", lines: ["Design and build", "solo, with an AI pair"] },
+                { label: "Timeline", lines: ["Sep 8 – 15, 2026"] },
+                { label: "Stack", lines: ["Pydantic AI", "Lenstronomy", "PyTorch", "Modal"] },
+                { label: "Skills", lines: ["Agent design", "Simulation", "ML training", "Benchmarking"] },
+              ]}
+            />
+          </div>
         </section>
 
-        {/* ------------------------------------------------------------- problem */}
-        <Section
-          id="problem"
-          kicker="01 · The problem"
-          title="Dark matter leaves fingerprints on lensed galaxies. Finding them needs data nobody has."
-          lede="A massive galaxy bends the light of one behind it into arcs. Small clumps of dark matter in the lens perturb those arcs by about one percent. What the clumps look like depends on what dark matter is."
-        >
+        {/* ---------------------------------------------------------- overview */}
+        <Section id="overview" kicker="Overview" title="Closing the loop between simulation and learning">
           <Prose>
             <p>
-              Cold dark matter predicts point-like subhalos. Ultralight axion dark matter predicts vortex lines. Both are subtle, and real
-              strong lenses are rare, so the only way to train a detector is to simulate: thousands of images per hypothesis, across every
-              plausible halo mass, redshift, mass fraction and axion mass.
+              LensCraft is an agent that plans and runs strong gravitational lensing simulation batches, trains classifiers and anomaly
+              detectors on the results, and uses what those models are uncertain about to decide what to simulate next. A human approves
+              every batch before it runs.
             </p>
             <p>
-              Two papers from the same group established the machine-learning side. Alexander et al. (2019) classified simulated lenses into
-              no-substructure, subhalo and vortex classes with ResNet-18 and AlexNet. Alexander et al. (2021) did it without labels, using
-              autoencoders trained on smooth lenses to flag anything they could not reconstruct. Both spent most of their effort on
-              generating and curating simulations by hand.
+              It was built in six phases over a week on Pydantic AI, Lenstronomy and Modal, with the machine-learning architectures ported
+              from two papers by the same research group. Every phase was tested and verified with a real run before the next one started.
+            </p>
+          </Prose>
+          <div className="mt-10">
+            <Meta
+              items={[
+                { label: "Accuracy", lines: ["0.93 held-out", "ResNet-18, 15k images"] },
+                { label: "Weak region", lines: ["0.29 → 0.62", "after one round"] },
+                { label: "Tool cost", lines: ["24× fewer tokens", "than no tools"] },
+                { label: "Engine check", lines: ["≤ 1.2% disagreement", "vs PyAutoLens"] },
+              ]}
+            />
+          </div>
+        </Section>
+
+        {/* ----------------------------------------------------------- problem */}
+        <Section id="problem" kicker="Problem" title="Dark matter leaves fingerprints on lensed galaxies, and finding them needs data nobody has">
+          <Prose>
+            <p>
+              A massive galaxy bends the light of one behind it into arcs. Small clumps of dark matter in the lens perturb those arcs by
+              about one percent, and what the clumps look like depends on what dark matter is. Cold dark matter predicts point-like
+              subhalos; ultralight axion dark matter predicts vortex lines.
+            </p>
+            <p>
+              Both signatures are subtle and real strong lenses are rare, so the only way to train a detector is to simulate: thousands of
+              images per hypothesis, across every plausible halo mass, redshift, mass fraction and axion mass. Alexander et al. (2019)
+              classified such simulations with ResNet-18 and AlexNet; Alexander et al. (2021) did it without labels using autoencoders.
+              Both spent most of their effort generating and curating simulations by hand.
             </p>
             <p>
               HEPTAPOD (Menzo et al., 2026) showed the pattern for high-energy physics: wrap the simulation engines in schema-validated
-              tools, coordinate them with run cards a human signs off on, and let an agent do the orchestration. This project applies that
-              pattern to lensing and adds the thing the pattern was missing: a feedback signal.
+              tools, coordinate them with run cards a human signs off on, and let an agent orchestrate. This project applies that pattern
+              to lensing and adds the piece it was missing, a feedback signal.
             </p>
           </Prose>
         </Section>
 
-        {/* ---------------------------------------------------------------- idea */}
-        <Section
-          id="idea"
-          kicker="02 · The idea"
-          title="Close the loop."
-          lede="Train on what you have, find where the model is uncertain, simulate more of exactly that, retrain. Repeat with a human approving each batch."
-        >
-          <LoopDiagram />
+        {/* -------------------------------------------------------------- idea */}
+        <Section id="idea" kicker="Idea" title="Train, find where the model is weak, simulate exactly that, repeat">
           <Prose>
             <p>
-              The claim the project tests is simple: a batch of simulations chosen by where the current model is weak should help more than
-              a batch of the same size chosen uniformly. If it does, the agent is doing planning under a real feedback signal rather than
-              running a script.
-            </p>
-            <p>
-              Everything else, the orchestration framework, the compute backend, the ported models, exists to make that comparison cheap
-              enough to run repeatedly.
+              The claim the project tests is simple: a batch of simulations chosen by where the current model is uncertain should help more
+              than a batch of the same size chosen uniformly. If it does, the agent is planning under a real feedback signal rather than
+              running a script. Everything else exists to make that comparison cheap enough to run repeatedly.
             </p>
           </Prose>
+          <div className="my-10">
+            <LoopDiagram />
+          </div>
         </Section>
 
-        {/* ----------------------------------------------------------- decisions */}
-        <Section
-          id="decisions"
-          kicker="03 · Ideation"
-          title="Six decisions that shaped the build."
-          lede="The design went through three revisions before any code existed. These are the forks that mattered, with what was considered and why each path was taken."
-        >
-          <ol className="grid gap-4">
-            {decisions.map((d, i) => (
-              <li key={d.question} className="rounded-lg border border-line bg-surface p-5 sm:p-6">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
-                  <h3 className="text-lg font-semibold text-ink">{d.question}</h3>
-                </div>
-                <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-[7rem_1fr]">
-                  <dt className="text-muted">Considered</dt>
+        {/* --------------------------------------------------------- decisions */}
+        <Section id="decisions" kicker="Ideation" title="Six decisions that shaped the build">
+          <Prose>
+            <p>The design went through three revisions before any code existed. These are the forks that mattered.</p>
+          </Prose>
+          <ol className="mt-10 divide-y divide-line border-t border-line">
+            {decisions.map((d) => (
+              <li key={d.question} className="py-8">
+                <h3 className="text-[1.2rem] font-semibold tracking-[-0.01em] text-ink">{d.question}</h3>
+                <dl className="mt-4 grid gap-x-8 gap-y-2 text-[1rem] leading-relaxed sm:grid-cols-[6.5rem_1fr]">
+                  <dt className="kicker">Considered</dt>
                   <dd className="text-ink-2">{d.options}</dd>
-                  <dt className="text-muted">Chosen</dt>
-                  <dd className="font-medium text-ink">{d.chosen}</dd>
-                  <dt className="text-muted">Why</dt>
-                  <dd className="leading-relaxed text-ink-2">{d.why}</dd>
+                  <dt className="kicker">Chosen</dt>
+                  <dd className="text-ink">{d.chosen}</dd>
+                  <dt className="kicker">Why</dt>
+                  <dd className="text-ink-2">{d.why}</dd>
                 </dl>
               </li>
             ))}
           </ol>
         </Section>
 
-        {/* -------------------------------------------------------- architecture */}
-        <Section
-          id="architecture"
-          kicker="04 · Architecture"
-          title="One agent, three tool tiers, one backend interface."
-          lede="Tools never talk to the simulator or to PyTorch directly. They talk to a ComputeBackend, so a command-line flag moves the whole pipeline from the laptop to Modal."
-        >
-          <ArchitectureDiagram />
-          <h3 className="mt-14 text-xl font-semibold text-ink">What flows through it</h3>
-          <p className="prose mt-2 text-ink-2">
-            The agent never sees pixels. It reasons over one JSON record per image with cheap statistics computed at generation time, and
-            over per-image model scores produced at evaluation time. That is what makes the uncertainty step a pure-numpy function rather
-            than another model.
-          </p>
-          <div className="mt-6">
+        {/* ------------------------------------------------------ architecture */}
+        <Section id="architecture" kicker="Architecture" title="One agent, three tool tiers, one backend interface">
+          <Prose>
+            <p>
+              Tools never talk to the simulator or to PyTorch directly. They talk to a compute backend, so a command-line flag moves the
+              whole pipeline from the laptop to Modal.
+            </p>
+          </Prose>
+          <div className="my-10">
+            <ArchitectureDiagram />
+          </div>
+          <Sub>What flows through it</Sub>
+          <Prose>
+            <p>
+              The agent never sees pixels. It reasons over one JSON record per image with cheap statistics computed at generation time,
+              and over per-image model scores produced at evaluation time. That is what makes the uncertainty step a small numpy function
+              rather than another model.
+            </p>
+          </Prose>
+          <div className="my-10">
             <DataFlowDiagram />
           </div>
-          <h3 className="mt-14 text-xl font-semibold text-ink">The approval gate</h3>
-          <p className="prose mt-2 text-ink-2">
-            Simulation batches and training jobs cost money, so those three tools require approval. Pydantic AI pauses the run and returns
-            the pending calls; a callback in our own code decides; the run resumes. The same callback drives the terminal prompt, the
-            auto-approver used by benchmarks, and the loop driver.
-          </p>
-          <div className="mt-6">
+          <Sub>The approval gate</Sub>
+          <Prose>
+            <p>
+              Simulation batches and training jobs cost money, so those tools require approval. Pydantic AI pauses the run and returns the
+              pending calls; a callback in our own code decides; the run resumes. The same callback drives the terminal prompt, the
+              auto-approver used by benchmarks, and the loop driver.
+            </p>
+          </Prose>
+          <div className="my-10">
             <ApprovalDiagram />
           </div>
-          <Details summary="What a LensCard looks like">
-            <Code>{`{
+          <Sub>What a run card looks like</Sub>
+          <Code>{`{
   "n_images": 2000,
   "substructure": "vortex",
   "halo_mass": 1e12,
@@ -152,69 +161,74 @@ export default function Page() {
   "image_size": 64,
   "seed": 1001
 }`}</Code>
+          <Prose>
             <p>
               A frozen Pydantic model with physics validation: the source must sit behind the lens, the mass fraction must be positive for
               substructure classes, and a card whose field of view cannot contain the Einstein radius is rejected before any pixel is
               rendered.
             </p>
-          </Details>
+          </Prose>
         </Section>
 
-        {/* --------------------------------------------------------------- build */}
-        <Section
-          id="build"
-          kicker="05 · The build"
-          title="Six phases, and what broke in each."
-          lede="Built in order over a week, each phase tested and verified with a real run before the next started. The things that broke are the useful part."
-        >
-          <ol className="relative grid gap-8 border-l border-line pl-6 sm:pl-8">
+        {/* ------------------------------------------------------------- build */}
+        <Section id="build" kicker="Process" title="Six phases, and what broke in each">
+          <Prose>
+            <p>Built in order, each phase verified with a real run before the next started. The things that broke are the useful part.</p>
+          </Prose>
+          <ol className="mt-4 divide-y divide-line">
             {phases.map((p) => (
-              <li key={p.n} className="relative">
-                <span className="absolute -left-[1.95rem] top-1.5 flex h-6 w-6 items-center justify-center rounded-full border border-line bg-surface font-mono text-[11px] text-ink sm:-left-[2.45rem]">
-                  {p.n}
-                </span>
-                <div className="flex flex-wrap items-baseline gap-x-3">
-                  <h3 className="text-xl font-semibold text-ink">{p.title}</h3>
-                  <span className="font-mono text-xs text-muted">{p.when}</span>
-                </div>
-                <p className="prose mt-2 text-ink-2">{p.delivered}</p>
-                <Details summary={`What broke (${p.broke.length})`}>
-                  <ul className="!mt-0">
+              <li key={p.n} className="py-10">
+                <p className="kicker">
+                  Phase {p.n} · {p.when}
+                </p>
+                <h3 className="mt-2 text-[1.35rem] font-semibold tracking-[-0.01em] text-ink">{p.title}</h3>
+                <p className="prose mt-4">{p.delivered}</p>
+                <p className="kicker mt-6">What broke</p>
+                <div className="prose text-[1.02rem]">
+                  <ul className="mt-2!">
                     {p.broke.map((b) => (
                       <li key={b.what}>
-                        <span className="text-ink">{b.what}</span> <span className="text-ink-2">{b.fix}</span>
+                        <span className="text-ink">{b.what}</span> {b.fix}
                       </li>
                     ))}
                   </ul>
-                </Details>
+                </div>
               </li>
             ))}
           </ol>
         </Section>
 
-        {/* ------------------------------------------------------------- results */}
-        <Section id="results" kicker="06 · Results" title="What the numbers say." lede="All evaluations are on 3,000 held-out images (1,000 per class) that no model ever trained on.">
-          <h3 className="text-xl font-semibold text-ink">The dataset</h3>
-          <p className="prose mt-2 text-ink-2">
-            5,000 training and 1,000 test images per class at 64 px in a Euclid-like setup, plus the batches added by the loop. 18,000 images
-            rendered in about a minute of wall time, sharded across Modal containers.
-          </p>
-          <Figure wide src="/figures/dataset_distributions.png" alt="SNR and substructure residual distributions per class" caption="Signal-to-noise is matched across classes by construction. The substructure perturbs the arcs by two to three percent of peak brightness at mass fraction 0.03." />
-          <Figure wide src="/figures/sample_images.png" alt="A grid of sample images per class" caption="Six samples per class, square-root stretched." />
+        {/* ----------------------------------------------------------- results */}
+        <Section id="results" kicker="Results" title="What the numbers say">
+          <Prose>
+            <p>All evaluations are on 3,000 held-out images, 1,000 per class, that no model ever trained on.</p>
+          </Prose>
 
-          <h3 className="mt-14 text-xl font-semibold text-ink">The classifier</h3>
-          <p className="prose mt-2 text-ink-2">
-            ResNet-18 with a single-channel stem, trained from scratch for ten epochs on the 15,000 training images. It is essentially
-            perfect on smooth lenses and misses about one vortex in five, and the uncertainty analysis says exactly which ones.
-          </p>
+          <Sub>The dataset</Sub>
+          <Prose>
+            <p>
+              5,000 training and 1,000 test images per class at 64 pixels in a Euclid-like setup, plus the batches added by the loop.
+              18,000 images rendered in about a minute of wall time, sharded across Modal containers.
+            </p>
+          </Prose>
+          <Figure src="/figures/dataset_distributions.png" alt="SNR and substructure residual distributions per class" caption="Signal-to-noise is matched across classes by construction. The substructure perturbs the arcs by two to three percent of peak brightness." />
+          <Figure src="/figures/sample_images.png" alt="A grid of sample images per class" caption="Six samples per class, square-root stretched." />
+
+          <Sub>The classifier</Sub>
+          <Prose>
+            <p>
+              ResNet-18 with a single-channel stem, trained from scratch for ten epochs on the 15,000 training images. It is essentially
+              perfect on smooth lenses and misses about one vortex in five, and the uncertainty analysis says exactly which ones.
+            </p>
+          </Prose>
           <Table
-            head={["true \\ predicted", "none", "subhalo", "vortex", "accuracy"]}
+            head={["True \\ predicted", "none", "subhalo", "vortex", "accuracy"]}
             rows={[
               [<ClassDot key="n" cls="none" />, "1000", "0", "0", "1.000"],
               [<ClassDot key="s" cls="subhalo" />, "2", "963", "35", "0.963"],
               [<ClassDot key="v" cls="vortex" />, "0", "178", "822", "0.822"],
             ]}
-            className="max-w-2xl"
+            className="max-w-xl"
           />
           <Figure
             src="/figures/uncertainty_clf_base_b.png"
@@ -222,15 +236,14 @@ export default function Page() {
             caption="Where the base classifier is weakest. The lightest axions produce vortex lines two to three arcseconds long; the same mass spread along a longer line perturbs the arcs less. Accuracy in that cell: 29%."
           />
 
-          <h3 className="mt-14 text-xl font-semibold text-ink">The loop, with a control</h3>
-          <p className="prose mt-2 text-ink-2">
-            The agent simulated 2,000 more vortex images at the axion mass of the weakest cell and retrained under an identical recipe. As a
-            control, 2,000 images drawn uniformly across the three classes were added instead.
-          </p>
-          <Table
-            head={["training data", "images", "accuracy", "macro AUC", "none", "subhalo", "vortex", "weak cell"]}
-            rows={loopTable.map((r) => [r.model, r.data, r.acc, r.auc, r.none, r.sub, r.vor, r.weak])}
-          />
+          <Sub>The loop, with a control</Sub>
+          <Prose>
+            <p>
+              The agent simulated 2,000 more vortex images at the axion mass of the weakest cell and retrained under an identical recipe.
+              As a control, 2,000 images drawn uniformly across the three classes were added instead.
+            </p>
+          </Prose>
+          <Table head={["Training data", "images", "accuracy", "macro AUC", "none", "subhalo", "vortex", "weak cell"]} rows={loopTable.map((r) => [r.model, r.data, r.acc, r.auc, r.none, r.sub, r.vor, r.weak])} />
           <Prose>
             <p>
               The uniform batch is indistinguishable from adding nothing. The targeted batch doubles accuracy in the weak region and lifts
@@ -240,43 +253,49 @@ export default function Page() {
             </p>
           </Prose>
 
-          <h3 className="mt-14 text-xl font-semibold text-ink">Tools versus no tools</h3>
-          <p className="prose mt-2 text-ink-2">
-            Same model, same prompt, same sandbox. One arm has the domain tools; the other has only a shell and file tools, Python with
-            lenstronomy and torch on the path, and the required output layout spelled out. Graded by a cumulative rubric read off the
-            sandbox: simulate, label, train on training data only, report the held-out AUC correctly.
-          </p>
-          <Table head={["arm", "pass", "mean requests", "mean tokens", "mean time", "AUC reached per trial"]} rows={benchTable.map((r) => [r.arm, r.pass, r.req, r.tok, r.time, r.auc])} className="max-w-3xl" />
-          <Figure wide src="/figures/bench_cost.png" alt="Bar charts of requests, tokens and wall time per arm" caption="Mean cost per trial. Kimi K3 completes the task either way; the tools change what it costs and whether the result is reproducible." />
+          <Sub>Tools versus no tools</Sub>
           <Prose>
             <p>
-              A strong model builds the whole pipeline from scratch and even reaches a higher AUC by engineering its own preprocessing, an
+              Same model, same prompt, same sandbox. One arm has the domain tools; the other has only a shell and file tools, Python with
+              lenstronomy and torch on the path, and the required output layout spelled out. Graded by a cumulative rubric read off the
+              sandbox: simulate, label, train on training data only, report the held-out AUC correctly.
+            </p>
+          </Prose>
+          <Table head={["Arm", "pass", "mean requests", "mean tokens", "mean time", "AUC reached per trial"]} rows={benchTable.map((r) => [r.arm, r.pass, r.req, r.tok, r.time, r.auc])} />
+          <Figure src="/figures/bench_cost.png" alt="Bar charts of requests, tokens and wall time per arm" caption="Mean cost per trial. Kimi K3 completes the task either way; the tools change what it costs and whether the result is reproducible." />
+          <Prose>
+            <p>
+              A strong model builds the whole pipeline from scratch and even reaches a higher AUC by engineering its own preprocessing: an
               asinh stretch, dihedral augmentation and a small-image ResNet stem. The domain tools trade that ceiling for 24 times fewer
               tokens, nine times less wall time, and an identical result on every trial.
             </p>
           </Prose>
 
-          <h3 className="mt-14 text-xl font-semibold text-ink">Two engines, one answer</h3>
-          <p className="prose mt-2 text-ink-2">
-            The same lens systems rendered through PyAutoLens agree with the lenstronomy port to about one percent of peak brightness. The
-            residual is the packages&apos; slightly different elliptical-radius conventions, and the point-mass substructure agrees as well as
-            the smooth lens does.
-          </p>
-          <Table head={["class", "shape residual, mean / max", "flux ratio", "centroid shift"]} rows={crossTable.map((r) => [<ClassDot key={r.cls} cls={r.cls as "none" | "subhalo" | "vortex"} />, r.rms, r.flux, r.centroid])} className="max-w-2xl" />
-        </Section>
-
-        {/* --------------------------------------------------------------- demos */}
-        <Section id="demos" kicker="07 · Demos" title="See it run." lede="Short recordings of the product. Each under two minutes.">
-          <div className="grid gap-8 md:grid-cols-2">
-            {videos.map((v) => (
-              <VideoSlot key={v.file} {...v} />
-            ))}
-          </div>
-        </Section>
-
-        {/* -------------------------------------------------------------- limits */}
-        <Section id="limits" kicker="08 · Limits" title="What this does not show yet." lede="The results above are real and reproducible. They are also early, and these are the caveats that matter.">
+          <Sub>Two engines, one answer</Sub>
           <Prose>
+            <p>
+              The same lens systems rendered through PyAutoLens agree with the lenstronomy port to about one percent of peak brightness.
+              The residual is the packages&apos; slightly different elliptical-radius conventions, and the point-mass substructure agrees as
+              well as the smooth lens does.
+            </p>
+          </Prose>
+          <Table head={["Class", "shape residual, mean / max", "flux ratio", "centroid shift"]} rows={crossTable.map((r) => [<ClassDot key={r.cls} cls={r.cls as "none" | "subhalo" | "vortex"} />, r.rms, r.flux, r.centroid])} className="max-w-xl" />
+        </Section>
+
+        {/* ------------------------------------------------------------- demos */}
+        <Section id="demos" kicker="Demos" title="See it run">
+          <Prose>
+            <p>Short recordings of the product, each under two minutes.</p>
+          </Prose>
+          {videos.map((v) => (
+            <VideoSlot key={v.file} {...v} />
+          ))}
+        </Section>
+
+        {/* ------------------------------------------------------------ limits */}
+        <Section id="limits" kicker="Limitations" title="What this does not show yet">
+          <Prose>
+            <p>The results above are real and reproducible. They are also early, and these are the caveats that matter.</p>
             <ul>
               <li>
                 <strong>Three trials per arm.</strong> The pass@k estimators are exact for the sample, but the sample is small. Ten or more
@@ -285,12 +304,11 @@ export default function Page() {
               <li>
                 <strong>The anomaly detector is at chance.</strong> The AAE reconstructs well but separates poorly, AUC 0.54, far from the
                 2021 paper&apos;s 0.93. At this resolution and mass fraction the substructure signal is one to three percent of peak, and ten
-                epochs is a fraction of what the paper trained for. Longer training, larger mass fractions, and the 150-pixel instrument are
-                the levers.
+                epochs is a fraction of what the paper trained for.
               </li>
               <li>
-                <strong>Targeting has a cost.</strong> The loop&apos;s gain in the weak region came with a subhalo regression from class imbalance.
-                Class-balanced batches or re-weighting is the natural fix and the natural second round.
+                <strong>Targeting has a cost.</strong> The loop&apos;s gain in the weak region came with a subhalo regression from class
+                imbalance. Class-balanced batches or re-weighting is the natural fix and the natural second round.
               </li>
               <li>
                 <strong>The core arm out-engineered the fixed recipe.</strong> Its asinh stretch and augmentation are data-pipeline choices the
@@ -300,32 +318,35 @@ export default function Page() {
           </Prose>
         </Section>
 
-        {/* ----------------------------------------------------------- reproduce */}
-        <Section id="reproduce" kicker="09 · Reproduce it" title="Clone to trained model in five commands." lede="Everything on this page came from the repository, a Modal account, and an LLM key.">
-          <ol className="grid gap-3">
+        {/* --------------------------------------------------------- reproduce */}
+        <Section id="reproduce" kicker="Reproduce" title="Clone to trained model in five commands">
+          <Prose>
+            <p>Everything on this page came from the repository, a Modal account, and an LLM key.</p>
+          </Prose>
+          <ol className="mt-8 grid gap-5">
             {reproduce.map((r) => (
-              <li key={r.cmd}>
+              <li key={r.cmd} className="min-w-0">
                 <Code>{r.cmd}</Code>
-                <p className="-mt-2 text-sm text-ink-2">{r.note}</p>
+                <p className="text-[0.95rem] text-ink-2">{r.note}</p>
               </li>
             ))}
           </ol>
-          <div className="mt-10">
+          <div className="mt-12">
             <Prose>
               <p>
                 Source, design document, tests and the generated report are at{" "}
-              <a href={REPO} target="_blank" rel="noreferrer">
-                github.com/amanibobo/lensgrav
-              </a>
-              . References: Menzo et al., <em>HEPTAPOD</em> (2026); Alexander et al., <em>Deep Learning the Morphology of Dark Matter
-              Substructure</em> (2019); Alexander et al., <em>Decoding Dark Matter Substructure without Supervision</em> (2021).
+                <a href={REPO} target="_blank" rel="noreferrer">
+                  github.com/amanibobo/lensgrav
+                </a>
+                . References: Menzo et al., <em>HEPTAPOD</em> (2026); Alexander et al., <em>Deep Learning the Morphology of Dark Matter
+                Substructure</em> (2019); Alexander et al., <em>Decoding Dark Matter Substructure without Supervision</em> (2021).
               </p>
             </Prose>
           </div>
         </Section>
       </main>
-      <footer className="border-t border-line py-10">
-        <div className="mx-auto max-w-5xl px-5 text-sm text-ink-2 sm:px-8">LensCraft · built September 2026 · figures generated by the project&apos;s own report tool.</div>
+      <footer className="py-12">
+        <div className="mx-auto max-w-[840px] px-6 text-[0.9rem] text-muted">LensCraft · September 2026 · figures generated by the project&apos;s own report tool</div>
       </footer>
     </>
   );

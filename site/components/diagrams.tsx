@@ -5,7 +5,7 @@ const ink2 = "var(--ink-2)";
 const line = "var(--line)";
 const surface = "var(--surface)";
 const accent = "var(--accent)";
-const font = "var(--font-geist-sans), system-ui, sans-serif";
+const font = "var(--font-inter), system-ui, sans-serif";
 const mono = "var(--font-geist-mono), ui-monospace, monospace";
 
 function Box({ x, y, w, h, title, sub, strong = false }: { x: number; y: number; w: number; h: number; title: string; sub?: string; strong?: boolean }) {

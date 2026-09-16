@@ -1,107 +1,77 @@
 @import "tailwindcss";
 
-/* Light palette on :root, dark palette under prefers-color-scheme. Same tokens, no per-component colours. */
 :root {
   color-scheme: light;
-  --bg: #f9f9f7;
-  --surface: #fcfcfb;
-  --surface-2: #f0efec;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --muted: #898781;
-  --line: #e1e0d9;
+  --bg: #ffffff;
+  --surface: #fafaf9;
+  --ink: #111111;
+  --ink-2: #5c5b57;
+  --muted: #8a8984;
+  --line: #e8e7e3;
   --accent: #2a78d6;
-  --accent-ink: #ffffff;
   --none: #2a78d6;
   --subhalo: #eb6834;
   --vortex: #1baf7a;
-  --good: #006300;
-  --serious: #d03b3b;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #0d0d0d;
-    --surface: #1a1a19;
-    --surface-2: #232322;
-    --ink: #ffffff;
-    --ink-2: #c3c2b7;
-    --muted: #898781;
-    --line: #2c2c2a;
-    --accent: #3987e5;
-    --accent-ink: #ffffff;
-    --none: #3987e5;
-    --subhalo: #d95926;
-    --vortex: #199e70;
-    --good: #0ca30c;
-    --serious: #e66767;
-  }
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
-  --color-accent-ink: var(--accent-ink);
   --color-none: var(--none);
   --color-subhalo: var(--subhalo);
   --color-vortex: var(--vortex);
-  --color-good: var(--good);
-  --color-serious: var(--serious);
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 4.5rem;
+  scroll-padding-top: 6rem;
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv11";
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Prose defaults for the case-study body */
+/* Body copy: 18px, relaxed, warm grey, as in the reference */
 .prose {
-  max-width: 68ch;
-  font-size: 1.0625rem;
-  line-height: 1.7;
-  color: var(--ink);
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--ink-2);
 }
 .prose p + p {
-  margin-top: 1rem;
+  margin-top: 1.1rem;
 }
 .prose a {
-  color: var(--accent);
+  color: var(--ink);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
+  text-decoration-color: var(--line);
+}
+.prose a:hover {
+  text-decoration-color: var(--ink);
 }
 .prose strong {
+  color: var(--ink);
   font-weight: 600;
 }
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
-  background: var(--surface-2);
-  padding: 0.1em 0.35em;
-  border-radius: 4px;
+  font-size: 0.88em;
+  color: var(--ink);
 }
 .prose ul,
 .prose ol {
-  margin: 1rem 0 1rem 1.25rem;
-}
-.prose li + li {
-  margin-top: 0.4rem;
+  margin: 1.1rem 0 1.1rem 1.4rem;
 }
 .prose ul {
   list-style: disc;
@@ -109,25 +79,17 @@ body {
 .prose ol {
   list-style: decimal;
 }
+.prose li + li {
+  margin-top: 0.5rem;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
 
 .tabular {
   font-variant-numeric: tabular-nums;
-}
-
-details > summary {
-  cursor: pointer;
-  list-style: none;
-}
-details > summary::-webkit-details-marker {
-  display: none;
-}
-details > summary::before {
-  content: "+";
-  display: inline-block;
-  width: 1.25rem;
-  color: var(--muted);
-  font-family: var(--font-mono);
-}
-details[open] > summary::before {
-  content: "−";
 }

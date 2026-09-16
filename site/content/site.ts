@@ -1,6 +1,7 @@
 export const REPO = "https://github.com/amanibobo/lensgrav";
 
 export const nav = [
+  { id: "overview", label: "Overview" },
   { id: "problem", label: "Problem" },
   { id: "idea", label: "Idea" },
   { id: "decisions", label: "Decisions" },
