@@ -1,3 +1,4 @@
+import { MediaSlot } from "@/components/media-slot";
 import { Rail } from "@/components/nav";
 import { VideoSlot } from "@/components/video-slot";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
@@ -97,6 +98,7 @@ export default function Page() {
               running a script. Everything else exists to make that comparison cheap enough to run repeatedly.
             </p>
           </Prose>
+          <MediaSlot file="sketch-loop.png" alt="Hand-drawn sketch of the simulate, train, find-weak-region loop" caption="The loop as first sketched." />
           <div className="my-10">
             <LoopDiagram />
           </div>
@@ -107,7 +109,8 @@ export default function Page() {
           <Prose>
             <p>The design went through three revisions before any code existed. These are the forks that mattered.</p>
           </Prose>
-          <ol className="mt-10 divide-y divide-line border-t border-line">
+          <MediaSlot file="sketch-versions.png" alt="Hand-drawn sketch of how the design changed from v1 to v3" caption="From building everything by hand (v1) to Orchestral AI (v2) to Pydantic AI (v3)." />
+          <ol className="mt-6 divide-y divide-line border-t border-line">
             {decisions.map((d) => (
               <li key={d.question} className="py-8">
                 <h3 className="text-[1.05rem] font-semibold tracking-[-0.01em] text-ink">{d.question}</h3>
@@ -132,6 +135,7 @@ export default function Page() {
               whole pipeline from the laptop to Modal.
             </p>
           </Prose>
+          <MediaSlot file="sketch-architecture.png" alt="Hand-drawn sketch of the agent, tool tiers, compute backend and Modal volume" caption="The architecture, hand-drawn." />
           <div className="my-10">
             <ArchitectureDiagram />
           </div>
@@ -157,6 +161,7 @@ export default function Page() {
           <div className="my-10">
             <ApprovalDiagram />
           </div>
+          <MediaSlot kind="screenshot" file="shot-terminal-approval.png" alt="Terminal screenshot of the approval prompt showing a proposed LensCard" caption="The approval prompt in the terminal: the proposed card, and y / e / n." />
           <Sub>What a run card looks like</Sub>
           <Code>{`{
   "n_images": 2000,
@@ -192,6 +197,16 @@ export default function Page() {
                 </p>
                 <h3 className="mt-2 text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">{p.title}</h3>
                 <p className="prose mt-3">{p.delivered}</p>
+                {p.n === 2 ? (
+                  <MediaSlot kind="screenshot" file="shot-modal-shards.png" alt="Modal dashboard showing simulation shards running in parallel containers" caption="A 5,000-image batch fanning out across containers on Modal." />
+                ) : null}
+                {p.n === 3 ? (
+                  <>
+                    <MediaSlot kind="screenshot" file="shot-modal-gpu.png" alt="Modal dashboard showing the L4 training container" caption="The training job on an L4." />
+                    <MediaSlot kind="screenshot" file="shot-modal-volume.png" alt="Modal volume browser showing runs and models" caption="Runs and models on the volume." />
+                  </>
+                ) : null}
+                {p.n === 4 ? <MediaSlot file="sketch-uncertainty.png" alt="Hand-drawn sketch of how the weak-cell search bins parameter space" caption="How the weak-cell search works, hand-drawn." /> : null}
                 <p className="kicker mt-5">What broke</p>
                 <div className="prose text-[0.95rem]">
                   <ul className="mt-2!">
@@ -272,6 +287,7 @@ export default function Page() {
           </Prose>
           <Table head={["Arm", "pass", "mean requests", "mean tokens", "mean time", "AUC reached per trial"]} rows={benchTable.map((r) => [r.arm, r.pass, r.req, r.tok, r.time, r.auc])} />
           <Figure src="/figures/bench_cost.png" alt="Bar charts of requests, tokens and wall time per arm" caption="Mean cost per trial. Kimi K3 completes the task either way; the tools change what it costs and whether the result is reproducible." />
+          <MediaSlot kind="screenshot" file="shot-bench-sandbox.png" alt="The core arm's sandbox directory full of scripts it wrote" caption="What the core arm left behind: its own simulator, trainer, and diagnostic scripts." />
           <Prose>
             <p>
               A strong model builds the whole pipeline from scratch and even reaches a higher AUC by engineering its own preprocessing: an
