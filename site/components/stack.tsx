@@ -1,7 +1,7 @@
 import * as si from "simple-icons";
 
-/* The tools and languages behind the project, as a strip of monochrome icons that take their
-   brand colour on hover, with a small tooltip. Icons are inlined from simple-icons at build time;
+/* The tools and languages behind the project, as a strip of icons in their brand colours,
+   with a small tooltip on hover. Icons are inlined from simple-icons at build time;
    packages without a logo get a monogram badge in the same style. */
 
 type Item = { name: string; path?: string; hex?: string; mono?: string; href: string };
@@ -17,14 +17,8 @@ const STACK: Item[] = [
   brand(si.siScipy, "https://scipy.org/"),
   brand(si.siPytorch, "https://pytorch.org/"),
   brand(si.siModal, "https://modal.com/"),
-  brand(si.siUv, "https://docs.astral.sh/uv/"),
   { name: "marimo", mono: "mo", hex: "#0ca30c", href: "https://marimo.io/" },
   brand(si.siTypescript, "https://www.typescriptlang.org/"),
-  brand(si.siReact, "https://react.dev/"),
-  brand(si.siNextdotjs, "https://nextjs.org/"),
-  brand(si.siTailwindcss, "https://tailwindcss.com/"),
-  brand(si.siVercel, "https://vercel.com/"),
-  brand(si.siGithub, "https://github.com/amanibobo/lensgrav"),
 ];
 
 export function Stack() {
@@ -39,7 +33,7 @@ export function Stack() {
               target="_blank"
               rel="noreferrer"
               aria-label={t.name}
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-line bg-white text-ink-2 transition-colors hover:border-[var(--brand)] hover:text-[var(--brand)] focus-visible:border-[var(--brand)] focus-visible:text-[var(--brand)] focus-visible:outline-none"
+              className="flex h-11 w-11 items-center justify-center rounded-lg border border-line bg-white text-[var(--brand)] transition-colors hover:border-[var(--brand)] focus-visible:border-[var(--brand)] focus-visible:outline-none"
               style={{ ["--brand" as string]: t.hex === "#000000" || t.hex === "#181717" ? "#111111" : t.hex }}
             >
               {t.path ? (
