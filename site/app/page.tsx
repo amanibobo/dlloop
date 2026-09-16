@@ -1,6 +1,7 @@
 import { Embed } from "@/components/embed";
 import { MediaSlot } from "@/components/media-slot";
 import { Rail } from "@/components/nav";
+import { Stack } from "@/components/stack";
 import { VideoSlot } from "@/components/video-slot";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
@@ -25,14 +26,7 @@ export default function Page() {
             <img src="/figures/hero_classes.png" alt="Three simulated Einstein rings, one per substructure class, and the perturbation each substructure adds" className="h-auto w-full" />
           </div>
           <div className="mt-10">
-            <Meta
-              items={[
-                { label: "Role", lines: ["Design and build", "solo, with an AI pair"] },
-                { label: "Timeline", lines: ["Sep 8 – 15, 2026"] },
-                { label: "Stack", lines: ["Pydantic AI", "Lenstronomy", "PyTorch", "Modal"] },
-                { label: "Skills", lines: ["Agent design", "Simulation", "ML training", "Benchmarking"] },
-              ]}
-            />
+            <Stack />
           </div>
         </section>
 
