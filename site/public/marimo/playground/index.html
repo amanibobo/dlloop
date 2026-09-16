@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="../uncertainty/assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="../uncertainty/assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="../uncertainty/assets/Lora-VariableFont_wght-CZceb_kH.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="../uncertainty/assets/PTSans-Regular-Bam3NpBI.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="../uncertainty/assets/PTSans-Bold-C_DwAp7Z.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="../uncertainty/assets/FiraMono-Regular-CEsLFVD9.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="../uncertainty/assets/FiraMono-Medium-D5MAsWEG.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="../uncertainty/assets/FiraMono-Bold-C6PDArdf.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>Simulate a lens</title>
+    <script type="module" crossorigin src="../uncertainty/assets/index-4n22QjCD.js"></script>
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/rolldown-runtime-B0Z9INg1.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/react-CBDbhulC.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/compiler-runtime-CYIjoINj.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useEvent-xfs0Sn4r.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/react-dom-BQrReHnR.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/schemas-aTUejmFi.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/isObject-BCaOs5rp.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/isSymbol-oX0TOjjx.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/now-Cmx0b_zA.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/debounce-aFmHgJZY.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/isArrayLikeObject-DnwgSs_Z.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/_initCloneObject-CM3WilQg.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/_baseMerge-DLqSVasz.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/objects-snlMn4yk.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/jsx-runtime-B74pBk57.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useEventListener-92uWqz-P.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/invariant-Ci2dTZ72.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/utils-D5Ywm7-q.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/constants-BDbGiS7O.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/Deferred-CrTnjj37.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/session-Sz5nSFku.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/config-BlNM0caL.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/clsx-DB0hHKMi.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/cn-ldLVeaqm.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/fullscreen-BH2jz-F4.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-DzCQtGkt.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/menu-items-BSRA2YI9.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/button-Dh8EwhsF.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/alert-dialog-CA-2mBs3.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/createLucideIcon-B7HeEoG2.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/check-BoA6XBpj.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/context-Do8M9TDF.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useNumberFormatter-DHJ9s6Vk.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/select-nLt2y0Sw.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/circle-ByJdIf5p.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/tooltip-BUtPzKB4.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-BtC9ym6k.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-CZNULd6Z.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/arrays-BqUx5USx.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/once-Haz_uxEL.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/capabilities-D8kPgMKr.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/cjs-C49f7GXV.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/createReducer-B_XmHROl.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-DiYjQAhI.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/marked.esm-B_3iMIUq.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/strings-CReV1AYG.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/requests-C6_IaFh7.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-B8pdsUrS.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useLifecycle-BUaJcygz.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/toDate-hGYJX0Ha.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/database-zap-CloO6gbw.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/numbers-Bc-r3jsC.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useDebounce-DgpSQhrP.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/input-DEbY281O.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/uuid-k9DpjH68.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/use-toast-DpWHUGuF.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/write-secret-modal-D6zoZgLY.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/plus-C4J9gIE1.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/trash-2-D_HX-0qx.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/badge-BSgtkC2e.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/preload-helper-HclGiUj8.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-DkPPv0FB.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-Dw9YRsCU.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-B0RXffUm.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-Cx4BE7jC.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dist-CKUpxYGQ.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/stex-Dc5bKD4z.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/paths-zcL04qUW.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useTheme-C-ri8BtY.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useAsyncData-Buhk-UgR.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/purify.es-DrVcFY1Q.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/cells-Cp-G34Rz.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/get-DjNf4SIX.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/_hasPath-BmRQipI0.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/hasIn-yw4sIeJR.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/_baseSet-gX6o3Pih.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/pick-Bs4cJfJU.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/errors-DzO-nXy-.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/switch-DjXr9Y9D.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/copy-BMXKNElG.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/eye-off-CFuPxa9F.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/copy-DlEomWzI.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/extends-CvVTau-c.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/esm-BHMOvJzM.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useAddCell-DdB_uBif.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/readonly-python-code-DpIyjHqY.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/LazyAnyLanguageCodeMirror-LboTfNDv.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/micromark-factory-space-D9Dr-k4J.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/chunk-5FQGJX7Z-CRg4xQWg.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/markdown-renderer-BZKlbm2Q.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/copy-icon-z8fuTE3w.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useRunCells-CX7oW5zy.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/RenderHTML-DwhMAd9l.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/blob-B2d_dHwI.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/share-CPtBiNgr.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/events-CbeVJ6OD.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/state-Di9TbuV9.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/ErrorBoundary-CDVGFYfr.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/config-B-r81uZ6.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/tabs-Cy1qXLzH.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/chevron-right-CKA5zVsM.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dropdown-menu-C40jM9o4.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/html-to-image-D6GUC5q6.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/download-DMxOzI7b.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/table-CUK1W5bI.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/refresh-cw-Bf-rx_aV.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/tree-actions-CG5g7aUQ.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/ellipsis-Dfik_tuW.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/external-link-Bp3BxyRA.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/spinner-Ck-Hgfvj.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/message-circle-BQB1AIAg.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/hat-glasses-C8LSY3HT.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/package-DPlscLzt.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/datasource-DrODSIs0.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/kbd-Cwh96ZBE.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/alert-dmKwNsrp.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useInstallPackage-DsD08SLK.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/state-B6AklCzD.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/cell-link-6burT2XF.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/MarimoErrorOutput-DqpoYOvw.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/VisuallyHidden-CBMDmozt.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useDateFormatter-BiqAQ-zI.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/en-US-yTIMUO13.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/isValid-nQ3Iam8J.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/dates-B58T85Jq.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/defaultLocale-CNPGWpMu.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/precisionRound-Bq_nmf5u.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/defaultLocale-Dm4DaIgg.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/vega-loader.browser-AQmjV9CX.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/tooltip-BG35uS_N.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/react-icons.esm-hr79-MCS.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/emotion-is-prop-valid.esm-nLO-SoUf.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useIframeCapabilities-C7Di8f2y.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/error-banner-Dw5YY9wq.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/utils-49LGK4zG.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/formats-C6s96nu2.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/table-DmqOOjfe.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/react-resizable-panels.browser.esm-BSRAHC4P.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/JsonOutput-CzIGPEZQ.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/chart-no-axes-column-ChZdjJhj.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/square-function-DkZweMAs.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/spec-DKsAmLTi.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/semaphore-BjoL5P0h.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/fileToBase64-NhpNrK5l.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useBoolean-BXC4CItZ.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/code-xml-B7x62Eeh.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/file-headphone-rFCxFRI8.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/file-DF8n85RA.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/image-ab13yGv4.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/file-icons-DdGYuADJ.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/globe-BQf75qV_.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/markdown-export-0rLbaq8b.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/data-grid-types-DgHVN_Zz.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/glide-utils-UGsrRHYj.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/column-preview-riSXbYe_.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/square-B58Ib8Ir.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/triangle-alert-MihykDYG.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/prop-types-Djf4O40e.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/es-CrFhA96G.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/renderShortcut-X-CJUSM8.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/bundle.esm-DzY74mzC.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/icons-CjLa9BiH.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/useDeepCompareMemoize-CLytDdMl.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/pathUtils-Cryrlpma.js">
+    <link rel="modulepreload" crossorigin href="../uncertainty/assets/floating-outline-DaUHnl_e.js">
+    <link rel="stylesheet" crossorigin href="../uncertainty/assets/cells-D-c15Ks-.css">
+    <link rel="stylesheet" crossorigin href="../uncertainty/assets/markdown-renderer-B7zTpxjS.css">
+    <link rel="stylesheet" crossorigin href="../uncertainty/assets/JsonOutput-BQtz7-np.css">
+    <link rel="stylesheet" crossorigin href="../uncertainty/assets/index-C7yAojRA.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    
+<script data-marimo="true">
+    Object.defineProperty(window, "__MARIMO_EXPORT_CONTEXT__", {
+        value: Object.freeze({
+            trusted: true,
+            notebookCode: "import marimo\n\n__generated_with = \"0.24.2\"\napp = marimo.App(width=\"medium\", app_title=\"Simulate a lens\")\n\n\n@app.cell\ndef _():\n    import base64\n    import io\n    import json\n    import sys\n\n    import marimo as mo\n    import numpy as np\n\n    return base64, io, json, mo, np, sys\n\n\n@app.cell\ndef _(json, mo, sys):\n    # A precomputed grid of simulations (notebooks/data/playground_grid.json), so the widget runs\n    # entirely in the browser: nothing is simulated on a server when someone moves a slider.\n    def _load_text(name: str) -\u003E str:\n        # In the browser build the data lives at /marimo/data/ on the site (shared by all the\n        # notebooks, independent of where the export's assets are); locally it is next to the file.\n        if \"pyodide\" in sys.modules:\n            from urllib.parse import urlsplit\n\n            from pyodide.http import open_url\n\n            u = urlsplit(str(mo.notebook_location()))\n            return open_url(f\"{u.scheme}://{u.netloc}/marimo/data/{name}\").read()\n        return (mo.notebook_location() / \"data\" / name).read_text()\n\n    data = json.loads(_load_text(\"playground_grid.json\"))\n    MF, LA, SEEDS, GRID = data[\"mass_fractions\"], data[\"log_axion\"], data[\"seeds\"], data[\"grid\"]\n    return GRID, LA, MF, SEEDS\n\n\n@app.cell\ndef _(LA, MF, SEEDS, mo):\n    substructure = mo.ui.dropdown(options=[\"vortex\", \"subhalo\", \"none\"], value=\"vortex\", label=\"substructure\")\n    mass_fraction = mo.ui.slider(steps=MF, value=0.03, label=\"mass fraction\")\n    log_axion = mo.ui.slider(steps=LA, value=-23.0, label=\"log10 axion mass (eV)\")\n    seed = mo.ui.slider(steps=SEEDS, value=3, label=\"seed\")\n    return log_axion, mass_fraction, seed, substructure\n\n\n@app.cell\ndef _(log_axion, mass_fraction, mo, seed, substructure):\n    controls = [substructure, seed]\n    if substructure.value != \"none\":\n        controls.append(mass_fraction)\n    if substructure.value == \"vortex\":\n        controls.append(log_axion)\n    mo.md(\n        f\"\"\"\n    The simulator the agent drives, with DeepLenseSim's defaults: a 10\u003Csup\u003E12\u003C/sup\u003E M\u003Csub\u003E\u2609\u003C/sub\u003E lens at z = 0.5,\n    a S\u00e9rsic source at z = 1, Euclid-like pixels. Left: the observed image. Right: what the substructure adds to the arcs.\n\n    {mo.hstack(controls, gap=2, justify=\"start\", wrap=True)}\n    \"\"\"\n    )\n    return\n\n\n@app.cell\ndef _(GRID, base64, io, log_axion, mass_fraction, mo, np, seed, substructure):\n    from PIL import Image\n\n    cls = substructure.value\n    key = f\"{cls}|{0 if cls == 'none' else mass_fraction.value}|{log_axion.value if cls == 'vortex' else 0}|{seed.value}\"\n    entry = GRID[key]\n\n    def _u8(b64: str) -\u003E \"np.ndarray\":\n        return np.frombuffer(base64.b64decode(b64), dtype=np.uint8).reshape(64, 64)\n\n    def _png(rgb: \"np.ndarray\") -\u003E bytes:\n        buf = io.BytesIO()\n        Image.fromarray(rgb).resize((320, 320), Image.NEAREST).save(buf, format=\"PNG\")\n        return buf.getvalue()\n\n    gray = _u8(entry[\"img\"])\n    observed = np.stack([gray] * 3, axis=-1)\n\n    # residual: 128 = zero; blue below, red above, white at zero (a small diverging map, no matplotlib)\n    r = (_u8(entry[\"res\"]).astype(float) - 128.0) / 127.0\n    t = np.abs(r)[..., None]\n    red = np.array([178, 24, 43], dtype=float)\n    blue = np.array([33, 102, 172], dtype=float)\n    white = np.array([255, 255, 255], dtype=float)\n    col = np.where(r[..., None] \u003E= 0, red, blue)\n    residual = (white * (1 - t) + col * t).clip(0, 255).astype(np.uint8)\n\n    f = entry[\"facts\"]\n    facts = [f\"Einstein radius {f['theta_E']:.2f}\u2033\", f\"field of view {f['fov']:.1f}\u2033\"]\n    if cls == \"vortex\":\n        facts.append(f\"vortex half-length {f['vortex_half_length']:.2f}\u2033\")\n    if cls == \"subhalo\":\n        facts.append(f\"{f['n_subhalos']} subhalos\")\n    if cls != \"none\":\n        facts.append(f\"peak perturbation {f['peak_fraction']:.1%} of peak brightness\")\n    else:\n        facts.append(\"no substructure, so the residual is zero\")\n\n    mo.vstack(\n        [\n            mo.hstack(\n                [\n                    mo.vstack([mo.md(\"**observed**\"), mo.image(src=_png(observed), width=320)], gap=0.3),\n                    mo.vstack([mo.md(\"**perturbation from substructure**\"), mo.image(src=_png(residual), width=320)], gap=0.3),\n                ],\n                gap=1.5,\n                justify=\"start\",\n                wrap=True,\n            ),\n            mo.md(\" \u00b7 \".join(facts)),\n        ]\n    )\n    return\n\n\nif __name__ == \"__main__\":\n    app.run()\n",
+        }),
+        writable: false,
+        configurable: false,
+    });
+</script>
+<marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.24.2%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22%2C%20app_title%3D%22Simulate%20a%20lens%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20base64%0A%20%20%20%20import%20io%0A%20%20%20%20import%20json%0A%20%20%20%20import%20sys%0A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20numpy%20as%20np%0A%0A%20%20%20%20return%20base64%2C%20io%2C%20json%2C%20mo%2C%20np%2C%20sys%0A%0A%0A%40app.cell%0Adef%20_(json%2C%20mo%2C%20sys)%3A%0A%20%20%20%20%23%20A%20precomputed%20grid%20of%20simulations%20(notebooks%2Fdata%2Fplayground_grid.json)%2C%20so%20the%20widget%20runs%0A%20%20%20%20%23%20entirely%20in%20the%20browser%3A%20nothing%20is%20simulated%20on%20a%20server%20when%20someone%20moves%20a%20slider.%0A%20%20%20%20def%20_load_text(name%3A%20str)%20-%3E%20str%3A%0A%20%20%20%20%20%20%20%20%23%20In%20the%20browser%20build%20the%20data%20lives%20at%20%2Fmarimo%2Fdata%2F%20on%20the%20site%20(shared%20by%20all%20the%0A%20%20%20%20%20%20%20%20%23%20notebooks%2C%20independent%20of%20where%20the%20export's%20assets%20are)%3B%20locally%20it%20is%20next%20to%20the%20file.%0A%20%20%20%20%20%20%20%20if%20%22pyodide%22%20in%20sys.modules%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20from%20urllib.parse%20import%20urlsplit%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20from%20pyodide.http%20import%20open_url%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20u%20%3D%20urlsplit(str(mo.notebook_location()))%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20open_url(f%22%7Bu.scheme%7D%3A%2F%2F%7Bu.netloc%7D%2Fmarimo%2Fdata%2F%7Bname%7D%22).read()%0A%20%20%20%20%20%20%20%20return%20(mo.notebook_location()%20%2F%20%22data%22%20%2F%20name).read_text()%0A%0A%20%20%20%20data%20%3D%20json.loads(_load_text(%22playground_grid.json%22))%0A%20%20%20%20MF%2C%20LA%2C%20SEEDS%2C%20GRID%20%3D%20data%5B%22mass_fractions%22%5D%2C%20data%5B%22log_axion%22%5D%2C%20data%5B%22seeds%22%5D%2C%20data%5B%22grid%22%5D%0A%20%20%20%20return%20GRID%2C%20LA%2C%20MF%2C%20SEEDS%0A%0A%0A%40app.cell%0Adef%20_(LA%2C%20MF%2C%20SEEDS%2C%20mo)%3A%0A%20%20%20%20substructure%20%3D%20mo.ui.dropdown(options%3D%5B%22vortex%22%2C%20%22subhalo%22%2C%20%22none%22%5D%2C%20value%3D%22vortex%22%2C%20label%3D%22substructure%22)%0A%20%20%20%20mass_fraction%20%3D%20mo.ui.slider(steps%3DMF%2C%20value%3D0.03%2C%20label%3D%22mass%20fraction%22)%0A%20%20%20%20log_axion%20%3D%20mo.ui.slider(steps%3DLA%2C%20value%3D-23.0%2C%20label%3D%22log10%20axion%20mass%20(eV)%22)%0A%20%20%20%20seed%20%3D%20mo.ui.slider(steps%3DSEEDS%2C%20value%3D3%2C%20label%3D%22seed%22)%0A%20%20%20%20return%20log_axion%2C%20mass_fraction%2C%20seed%2C%20substructure%0A%0A%0A%40app.cell%0Adef%20_(log_axion%2C%20mass_fraction%2C%20mo%2C%20seed%2C%20substructure)%3A%0A%20%20%20%20controls%20%3D%20%5Bsubstructure%2C%20seed%5D%0A%20%20%20%20if%20substructure.value%20!%3D%20%22none%22%3A%0A%20%20%20%20%20%20%20%20controls.append(mass_fraction)%0A%20%20%20%20if%20substructure.value%20%3D%3D%20%22vortex%22%3A%0A%20%20%20%20%20%20%20%20controls.append(log_axion)%0A%20%20%20%20mo.md(%0A%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20The%20simulator%20the%20agent%20drives%2C%20with%20DeepLenseSim's%20defaults%3A%20a%2010%3Csup%3E12%3C%2Fsup%3E%20M%3Csub%3E%E2%98%89%3C%2Fsub%3E%20lens%20at%20z%20%3D%200.5%2C%0A%20%20%20%20a%20S%C3%A9rsic%20source%20at%20z%20%3D%201%2C%20Euclid-like%20pixels.%20Left%3A%20the%20observed%20image.%20Right%3A%20what%20the%20substructure%20adds%20to%20the%20arcs.%0A%0A%20%20%20%20%7Bmo.hstack(controls%2C%20gap%3D2%2C%20justify%3D%22start%22%2C%20wrap%3DTrue)%7D%0A%20%20%20%20%22%22%22%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_(GRID%2C%20base64%2C%20io%2C%20log_axion%2C%20mass_fraction%2C%20mo%2C%20np%2C%20seed%2C%20substructure)%3A%0A%20%20%20%20from%20PIL%20import%20Image%0A%0A%20%20%20%20cls%20%3D%20substructure.value%0A%20%20%20%20key%20%3D%20f%22%7Bcls%7D%7C%7B0%20if%20cls%20%3D%3D%20'none'%20else%20mass_fraction.value%7D%7C%7Blog_axion.value%20if%20cls%20%3D%3D%20'vortex'%20else%200%7D%7C%7Bseed.value%7D%22%0A%20%20%20%20entry%20%3D%20GRID%5Bkey%5D%0A%0A%20%20%20%20def%20_u8(b64%3A%20str)%20-%3E%20%22np.ndarray%22%3A%0A%20%20%20%20%20%20%20%20return%20np.frombuffer(base64.b64decode(b64)%2C%20dtype%3Dnp.uint8).reshape(64%2C%2064)%0A%0A%20%20%20%20def%20_png(rgb%3A%20%22np.ndarray%22)%20-%3E%20bytes%3A%0A%20%20%20%20%20%20%20%20buf%20%3D%20io.BytesIO()%0A%20%20%20%20%20%20%20%20Image.fromarray(rgb).resize((320%2C%20320)%2C%20Image.NEAREST).save(buf%2C%20format%3D%22PNG%22)%0A%20%20%20%20%20%20%20%20return%20buf.getvalue()%0A%0A%20%20%20%20gray%20%3D%20_u8(entry%5B%22img%22%5D)%0A%20%20%20%20observed%20%3D%20np.stack(%5Bgray%5D%20*%203%2C%20axis%3D-1)%0A%0A%20%20%20%20%23%20residual%3A%20128%20%3D%20zero%3B%20blue%20below%2C%20red%20above%2C%20white%20at%20zero%20(a%20small%20diverging%20map%2C%20no%20matplotlib)%0A%20%20%20%20r%20%3D%20(_u8(entry%5B%22res%22%5D).astype(float)%20-%20128.0)%20%2F%20127.0%0A%20%20%20%20t%20%3D%20np.abs(r)%5B...%2C%20None%5D%0A%20%20%20%20red%20%3D%20np.array(%5B178%2C%2024%2C%2043%5D%2C%20dtype%3Dfloat)%0A%20%20%20%20blue%20%3D%20np.array(%5B33%2C%20102%2C%20172%5D%2C%20dtype%3Dfloat)%0A%20%20%20%20white%20%3D%20np.array(%5B255%2C%20255%2C%20255%5D%2C%20dtype%3Dfloat)%0A%20%20%20%20col%20%3D%20np.where(r%5B...%2C%20None%5D%20%3E%3D%200%2C%20red%2C%20blue)%0A%20%20%20%20residual%20%3D%20(white%20*%20(1%20-%20t)%20%2B%20col%20*%20t).clip(0%2C%20255).astype(np.uint8)%0A%0A%20%20%20%20f%20%3D%20entry%5B%22facts%22%5D%0A%20%20%20%20facts%20%3D%20%5Bf%22Einstein%20radius%20%7Bf%5B'theta_E'%5D%3A.2f%7D%E2%80%B3%22%2C%20f%22field%20of%20view%20%7Bf%5B'fov'%5D%3A.1f%7D%E2%80%B3%22%5D%0A%20%20%20%20if%20cls%20%3D%3D%20%22vortex%22%3A%0A%20%20%20%20%20%20%20%20facts.append(f%22vortex%20half-length%20%7Bf%5B'vortex_half_length'%5D%3A.2f%7D%E2%80%B3%22)%0A%20%20%20%20if%20cls%20%3D%3D%20%22subhalo%22%3A%0A%20%20%20%20%20%20%20%20facts.append(f%22%7Bf%5B'n_subhalos'%5D%7D%20subhalos%22)%0A%20%20%20%20if%20cls%20!%3D%20%22none%22%3A%0A%20%20%20%20%20%20%20%20facts.append(f%22peak%20perturbation%20%7Bf%5B'peak_fraction'%5D%3A.1%25%7D%20of%20peak%20brightness%22)%0A%20%20%20%20else%3A%0A%20%20%20%20%20%20%20%20facts.append(%22no%20substructure%2C%20so%20the%20residual%20is%20zero%22)%0A%0A%20%20%20%20mo.vstack(%0A%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.hstack(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mo.vstack(%5Bmo.md(%22**observed**%22)%2C%20mo.image(src%3D_png(observed)%2C%20width%3D320)%5D%2C%20gap%3D0.3)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20mo.vstack(%5Bmo.md(%22**perturbation%20from%20substructure**%22)%2C%20mo.image(src%3D_png(residual)%2C%20width%3D320)%5D%2C%20gap%3D0.3)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20gap%3D1.5%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20justify%3D%22start%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20wrap%3DTrue%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20mo.md(%22%20%C2%B7%20%22.join(facts))%2C%0A%20%20%20%20%20%20%20%20%5D%0A%20%20%20%20)%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <script data-marimo="true">
+      Object.defineProperty(window, "__MARIMO_MOUNT_CONFIG__", {
+        value: Object.freeze({
+            "filename": "notebook.py",
+            "cwd": "",
+            "lspWorkspace": null,
+            "mode": "read",
+            "version": "0.24.2",
+            "serverToken": "unused",
+            "config": {"ai": {"allow_provider_config": true, "custom_providers": {}, "enabled": true, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "auto_close_pairs": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "code_lens": true, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": true, "theme": "light"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "pip"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "show_tracebacks": false, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"app_title": "Simulate a lens", "sql_output": "auto", "width": "medium"},
+            "layout": null,
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null
+        }),
+        writable: false,
+        configurable: false,
+      });
+    </script>
+  </body>
+</html>

@@ -23,12 +23,16 @@ def _(json, mo, np, sys):
     # Data sits next to the notebook (data/...). mo.notebook_location() is a directory locally and
     # a URL in the browser build, where the files are fetched synchronously.
     def _load_text(name: str) -> str:
-        loc = mo.notebook_location()
+        # In the browser build the data lives at /marimo/data/ on the site (shared by all the
+        # notebooks, independent of where the export's assets are); locally it is next to the file.
         if "pyodide" in sys.modules:
+            from urllib.parse import urlsplit
+
             from pyodide.http import open_url
 
-            return open_url(f"{str(loc).rstrip('/')}/data/{name}").read()
-        return (loc / "data" / name).read_text()
+            u = urlsplit(str(mo.notebook_location()))
+            return open_url(f"{u.scheme}://{u.netloc}/marimo/data/{name}").read()
+        return (mo.notebook_location() / "data" / name).read_text()
 
     scores = json.loads(_load_text("scores_clf_base_b.json"))
     _imgs = json.loads(_load_text("images_te1k.json"))

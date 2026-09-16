@@ -29,16 +29,17 @@ install && npm run dev`, or deploy to Vercel with the root directory set to `sit
 |---|---|---|
 | `uncertainty_explorer.py` | in the browser (WASM), on the bundled held-out scores in `notebooks/data/` | Results section |
 | `pass_at_k.py` | in the browser (WASM) | Results, benchmark |
-| `playground.py` | on Modal (`modal deploy -m lenscraft.compute.modal_playground`), it needs lenstronomy | Idea section |
+| `playground.py` | in the browser (WASM), on a precomputed grid in `notebooks/data/playground_grid.json` | Idea section |
 
 Re-export the browser ones after editing:
 
 ```sh
 uv run marimo export html-wasm notebooks/uncertainty_explorer.py -o site/public/marimo/uncertainty --mode run --no-show-code
 uv run marimo export html-wasm notebooks/pass_at_k.py -o site/public/marimo/passk --mode run --no-show-code
-cp notebooks/data/*.json site/public/marimo/uncertainty/data/
-# the two exports share identical assets; keep one copy:
-sed -i '' 's#\./assets/#../uncertainty/assets/#g' site/public/marimo/passk/index.html && rm -rf site/public/marimo/passk/assets
+uv run marimo export html-wasm notebooks/playground.py -o site/public/marimo/playground --mode run --no-show-code
+mkdir -p site/public/marimo/data && cp notebooks/data/*.json site/public/marimo/data/   # served at /marimo/data/
+# the exports share identical assets; keep one copy:
+for d in passk playground; do sed -i '' 's#\./assets/#../uncertainty/assets/#g' site/public/marimo/$d/index.html && rm -rf site/public/marimo/$d/assets; done
 ```
 
 To edit one live: `uv run marimo edit notebooks/playground.py`.

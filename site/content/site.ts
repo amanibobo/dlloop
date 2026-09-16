@@ -1,11 +1,11 @@
 export const REPO = "https://github.com/amanibobo/lensgrav";
 
-// Interactive marimo apps. The two WASM exports are served from /marimo/... on this site; the
-// playground needs the simulator and runs on Modal (set after `modal deploy`).
+// Interactive marimo apps, all WASM exports served from /marimo/... on this site. The playground
+// uses a precomputed grid of simulations, so nothing runs on a server when someone plays with it.
 export const embeds = {
   explorer: "/marimo/uncertainty/index.html",
   passk: "/marimo/passk/index.html",
-  playground: process.env.NEXT_PUBLIC_PLAYGROUND_URL ?? "https://amanibobo1--lenscraft-playground-playground.modal.run",
+  playground: "/marimo/playground/index.html",
 };
 
 export const papers = {

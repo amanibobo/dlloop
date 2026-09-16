@@ -110,7 +110,7 @@ export default function Page() {
               the image and its perturbation of the arcs fades. That region is where the classifier turned out to be weakest.
             </p>
           </Prose>
-          <Embed src={embeds.playground} title="Simulate a lens" height={620} caption="Runs on Modal; each render is about 50 ms once the container is warm." />
+          <Embed src={embeds.playground} title="Simulate a lens" height={620} caption="A precomputed grid of 183 simulations, so it runs entirely in your browser; the first load takes a few seconds." />
         </Section>
 
         {/* --------------------------------------------------------- decisions */}
