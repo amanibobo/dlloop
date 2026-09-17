@@ -232,7 +232,10 @@ export default function Page() {
         {/* ----------------------------------------------------------- results */}
         <Section id="results" kicker="Results" title="What the numbers say">
           <Prose>
-            <p>All evaluations are on 3,000 held-out images, 1,000 per class, that no model ever trained on.</p>
+            <p>
+              The models were trained on 15,000 simulated images. Every number below was measured on a separate set of 3,000 images, 1,000 per
+              class, generated with different seeds and kept out of training, so the scores reflect what the models learned rather than what they memorised.
+            </p>
           </Prose>
 
           <Sub>The dataset</Sub>
