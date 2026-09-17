@@ -87,7 +87,7 @@ export default function Page() {
         </Section>
 
         {/* -------------------------------------------------------------- idea */}
-        <Section id="idea" kicker="Idea" title="Train, find where the model is weak, simulate exactly that, repeat">
+        <Section id="idea" kicker="Idea" title="The idea">
           <Prose>
             <p>
               The claim the project tests is simple: a batch of simulations chosen by where the current model is uncertain should help more
@@ -110,7 +110,7 @@ export default function Page() {
         </Section>
 
         {/* --------------------------------------------------------- decisions */}
-        <Section id="decisions" kicker="Ideation" title="Six decisions that shaped the build">
+        <Section id="decisions" kicker="Ideation" title="Key decisions">
           <Prose>
             <p>The design went through three revisions before any code existed. These are the forks that mattered.</p>
           </Prose>
@@ -133,7 +133,7 @@ export default function Page() {
         </Section>
 
         {/* ------------------------------------------------------ architecture */}
-        <Section id="architecture" kicker="Architecture" title="One agent, three tool tiers, one backend interface">
+        <Section id="architecture" kicker="Architecture" title="Architecture">
           <Prose>
             <p>
               Tools never talk to the simulator or to PyTorch directly. They talk to a compute backend, so a command-line flag moves the
@@ -190,7 +190,7 @@ export default function Page() {
         </Section>
 
         {/* ------------------------------------------------------------- build */}
-        <Section id="build" kicker="Process" title="Six phases, and what broke in each">
+        <Section id="build" kicker="Process" title="The build">
           <Prose>
             <p>Built in order, each phase verified with a real run before the next started. The things that broke are the useful part.</p>
           </Prose>
@@ -332,7 +332,7 @@ export default function Page() {
         </Section>
 
         {/* ------------------------------------------------------------ limits */}
-        <Section id="limits" kicker="Limitations" title="What this does not show yet">
+        <Section id="limits" kicker="Limitations" title="Limitations">
           <Prose>
             <p>The results above are real and reproducible. They are also early, and these are the caveats that matter.</p>
             <ul>
