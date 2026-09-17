@@ -5,7 +5,7 @@ import { Stack } from "@/components/stack";
 import { VideoSlot } from "@/components/video-slot";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
-import { benchTable, crossTable, decisions, embeds, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
+import { benchTable, crossTable, embeds, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
 
 export default function Page() {
   return (
@@ -110,26 +110,28 @@ export default function Page() {
         </Section>
 
         {/* --------------------------------------------------------- decisions */}
-        <Section id="decisions" kicker="Ideation" title="Key decisions">
+        <Section id="decisions" title="Key decisions">
           <Prose>
-            <p>The design went through three revisions before any code existed. These are the forks that mattered.</p>
+            <p>
+              The design went through three versions before any code existed. The first built everything by hand, including the agent
+              loop. The second sat on Orchestral AI, the framework HEPTAPOD itself uses. The third, and the one that shipped, uses
+              Pydantic AI, mostly because the run cards and dataset records were already Pydantic models, so tool arguments and structured
+              outputs came for free. It also turned out to support approval-gated tools natively, which collapsed a planned two-agent
+              propose-then-execute design into a single agent with one gated tool and an approval callback in our own code. That callback
+              is a plain function returning approve, approve with edits, or deny, so it is unit-tested without an LLM, and the same
+              function drives the terminal prompt, the benchmark&apos;s auto-approver, and the loop driver.
+            </p>
+            <p>
+              Compute and data went to Modal rather than a rented VM or the laptop, which had 300 MB free the day the project started. The
+              pipeline is function-shaped, so each tool became a remote function behind the same submit-and-status interface as the local
+              backend; batches shard across containers and training gets an L4 on demand. The images live on a Modal volume that mounts
+              straight into the GPU containers, after a brief detour considering a vector database, which stores embeddings and cannot hold
+              image arrays. The agent runs on Kimi K3 through Fireworks, though any Pydantic AI provider is a one-line change, and the ML
+              models were ported layer for layer from the group&apos;s 2019 and 2021 papers rather than redesigned, since the contribution
+              here is the loop around them, not the networks.
+            </p>
           </Prose>
           <MediaSlot file="sketch-versions.png" alt="Hand-drawn sketch of how the design changed from v1 to v3" caption="From building everything by hand (v1) to Orchestral AI (v2) to Pydantic AI (v3)." />
-          <ol className="mt-6 divide-y divide-line border-t border-line">
-            {decisions.map((d) => (
-              <li key={d.question} className="py-8">
-                <h3 className="text-[1.05rem] font-semibold tracking-[-0.01em] text-ink">{d.question}</h3>
-                <dl className="mt-3 grid gap-x-8 gap-y-1.5 text-[0.92rem] leading-relaxed sm:grid-cols-[6.5rem_1fr]">
-                  <dt className="kicker">Considered</dt>
-                  <dd className="text-ink-2">{d.options}</dd>
-                  <dt className="kicker">Chosen</dt>
-                  <dd className="text-ink">{d.chosen}</dd>
-                  <dt className="kicker">Why</dt>
-                  <dd className="text-ink-2">{d.why}</dd>
-                </dl>
-              </li>
-            ))}
-          </ol>
         </Section>
 
         {/* ------------------------------------------------------ architecture */}
