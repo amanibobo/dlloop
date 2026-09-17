@@ -2,12 +2,11 @@ import type { ReactNode } from "react";
 
 /* Column: 780px, centred, generous vertical rhythm. Sections are typographic, not boxed. */
 
-export function Section({ id, kicker, title, children }: { id: string; kicker: string; title: string; children: ReactNode }) {
+export function Section({ id, title, children }: { id: string; kicker?: string; title: string; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-16 py-12 sm:py-16">
       <div className="mx-auto w-full max-w-195 px-6">
-        <p className="kicker">{kicker}</p>
-        <h2 className="mt-2.5 text-[1.55rem] font-semibold leading-[1.22] tracking-[-0.01em] text-ink sm:text-[1.75rem]">{title}</h2>
+        <h2 className="text-[1.55rem] font-semibold leading-[1.22] tracking-[-0.01em] text-ink sm:text-[1.75rem]">{title}</h2>
         <div className="mt-5">{children}</div>
       </div>
     </section>
