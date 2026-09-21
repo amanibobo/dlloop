@@ -21,10 +21,10 @@ export function Rail() {
   }, []);
 
   return (
-    <nav aria-label="Sections" className="fixed left-8 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-2 lg:flex">
+    <nav aria-label="Sections" className="fixed left-8 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-1 lg:flex">
       {nav.map((n) => (
-        <a key={n.id} href={`#${n.id}`} title={n.label} className="group flex h-3 items-center">
-          <span className={`block h-px transition-all ${active === n.id ? "w-6 bg-ink" : "w-5 bg-line group-hover:bg-muted"}`} />
+        <a key={n.id} href={`#${n.id}`} title={n.label} className="group flex h-2 items-center">
+          <span className={`block h-0.5 rounded-full transition-all ${active === n.id ? "w-4 bg-ink" : "w-3 bg-line group-hover:bg-muted"}`} />
         </a>
       ))}
     </nav>
