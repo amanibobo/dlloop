@@ -193,9 +193,6 @@ export default function Page() {
 
         {/* ------------------------------------------------------------- build */}
         <Section id="build" kicker="Process" title="The build">
-          <Prose>
-            <p>Built in order, each phase verified with a real run before the next started. The things that broke are the useful part.</p>
-          </Prose>
           <ol className="mt-4 divide-y divide-line">
             {phases.map((p) => (
               <li key={p.n} className="py-10">
