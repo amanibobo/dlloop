@@ -90,7 +90,6 @@ export const phases: Phase[] = [
     delivered:
       "LensCard (the run card a human approves), lensjsonl (one JSON record per image with cheap statistics the agent can reason over), and a port of DeepLenseSim's lenstronomy wrapper driven by a card instead of hard-coded constants. About 50 ms per image on a laptop.",
     broke: [
-      { what: "The disk hit 300 MB free during the first dependency install.", fix: "Space freed itself, but it fixed the compute decision: nothing heavy would ever live on this machine." },
       { what: "DeepLenseSim had four bugs: Einstein radii from luminosity instead of angular-diameter distances, a Poisson subhalo count drawn and then ignored, the Euclid image adding the model to itself, and a mass fraction that meant different things per class.", fix: "Fixed and documented rather than copied. The correct Einstein radius for the default lens is 1.66 arcsec, not 1.35." },
       { what: "A 32-pixel image at 0.05 arcsec per pixel silently produced pure noise: the arcs sat outside the field of view.", fix: "A guard rejects any card whose field is narrower than the Einstein radius, as a structured failure the agent can read." },
       { what: "lenstronomy had renamed its keyword arguments since DeepLenseSim was written.", fix: "Two renames, found by inspecting the installed signatures instead of trusting the old code." },
@@ -104,7 +103,6 @@ export const phases: Phase[] = [
       "One Pydantic AI agent with simulation tools, an approval loop that pauses on expensive calls, and a ComputeBackend interface with a local implementation and a Modal implementation. Batches shard 500 images per container; per-image seeding makes a sharded remote run bit-identical to a local one.",
     broke: [
       { what: "Pydantic AI could not resolve a tool's dependency type that was imported only for type checking.", fix: "The dependency class moved to its own module and is imported for real." },
-      { what: "The first Kimi model id was not deployed on the account.", fix: "Listed the account's models and switched to Kimi K3." },
       { what: "The shell running the automation was zsh, which does not word-split variables the way bash does.", fix: "Six simulation runs got empty arguments before that was noticed. Explicit commands from then on." },
     ],
   },
@@ -151,7 +149,6 @@ export const phases: Phase[] = [
       "A HEPTAPOD-style benchmark: the same model and prompt, one arm with the domain tools and one with only a sandboxed shell and file tools, graded by a cumulative four-stage rubric read off the sandbox. Plus a report generator that produced the figures on this page.",
     broke: [
       { what: "The last rubric stage thresholded AUC, and a ResNet-18 trained from scratch on under 200 images sits at chance whatever the settings.", fix: "The stage now checks that a held-out evaluation exists and that the number the agent reports matches the file. Correct reporting, not luck." },
-      { what: "A network outage killed one run; every later trial failed instantly with a connection error.", fix: "Infrastructure errors are retried instead of scored." },
       { what: "The sandbox path check raised on macOS because temp directories resolve through a /private symlink.", fix: "Resolve the workspace once." },
     ],
   },
