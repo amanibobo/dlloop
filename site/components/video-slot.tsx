@@ -39,7 +39,7 @@ export function VideoSlot({ file, title, caption }: { file: string; title: strin
       </div>
       <figcaption className="mt-4 text-center">
         <span className="block text-[0.95rem] text-ink">{title}</span>
-        <span className="mt-1 block text-[0.9rem] leading-relaxed text-ink-2">{caption}</span>
+        {caption ? <span className="mt-1 block text-[0.9rem] leading-relaxed text-ink-2">{caption}</span> : null}
       </figcaption>
     </figure>
   );

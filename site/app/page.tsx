@@ -95,7 +95,7 @@ export default function Page() {
               running a script. Everything else exists to make that comparison cheap enough to run repeatedly.
             </p>
           </Prose>
-          <MediaSlot file="sketch-loop.png" alt="Hand-drawn sketch of the simulate, train, find-weak-region loop" caption="The loop as first sketched." />
+          <MediaSlot file="sketch-loop.png" alt="Hand-drawn sketch of the simulate, train, find-weak-region loop" />
           <div className="my-10">
             <LoopDiagram />
           </div>
@@ -106,7 +106,7 @@ export default function Page() {
               the image and its perturbation of the arcs fades. That region is where the classifier turned out to be weakest.
             </p>
           </Prose>
-          <Embed src={embeds.playground} title="Simulate a lens" height={620} caption="A precomputed grid of 183 simulations, so it runs entirely in your browser; the first load takes a few seconds." />
+          <Embed src={embeds.playground} title="Simulate a lens" height={620} />
         </Section>
 
         {/* --------------------------------------------------------- decisions */}
@@ -131,7 +131,7 @@ export default function Page() {
               here is the loop around them, not the networks.
             </p>
           </Prose>
-          <MediaSlot file="sketch-versions.png" alt="Hand-drawn sketch of how the design changed from v1 to v3" caption="From building everything by hand (v1) to Orchestral AI (v2) to Pydantic AI (v3)." />
+          <MediaSlot file="sketch-versions.png" alt="Hand-drawn sketch of how the design changed from v1 to v3" />
         </Section>
 
         {/* ------------------------------------------------------ architecture */}
@@ -142,7 +142,7 @@ export default function Page() {
               whole pipeline from the laptop to Modal.
             </p>
           </Prose>
-          <MediaSlot file="sketch-architecture.png" alt="Hand-drawn sketch of the agent, tool tiers, compute backend and Modal volume" caption="The architecture, hand-drawn." />
+          <MediaSlot file="sketch-architecture.png" alt="Hand-drawn sketch of the agent, tool tiers, compute backend and Modal volume" />
           <div className="my-10">
             <ArchitectureDiagram />
           </div>
@@ -168,7 +168,7 @@ export default function Page() {
           <div className="my-10">
             <ApprovalDiagram />
           </div>
-          <MediaSlot kind="screenshot" file="shot-terminal-approval.png" alt="Terminal screenshot of the approval prompt showing a proposed LensCard" caption="The approval prompt in the terminal: the proposed card, and y / e / n." />
+          <MediaSlot kind="screenshot" file="shot-terminal-approval.png" alt="Terminal screenshot of the approval prompt showing a proposed LensCard" />
           <Sub>What a run card looks like</Sub>
           <Code>{`{
   "n_images": 2000,
@@ -199,21 +199,18 @@ export default function Page() {
           <ol className="mt-4 divide-y divide-line">
             {phases.map((p) => (
               <li key={p.n} className="py-10">
-                <p className="kicker">
-                  Phase {p.n} · {p.when}
-                </p>
-                <h3 className="mt-2 text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">{p.title}</h3>
+                <h3 className="text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">{p.title}</h3>
                 <p className="prose mt-3">{p.delivered}</p>
                 {p.n === 2 ? (
-                  <MediaSlot kind="screenshot" file="shot-modal-shards.png" alt="Modal dashboard showing simulation shards running in parallel containers" caption="A 5,000-image batch fanning out across containers on Modal." />
+                  <MediaSlot kind="screenshot" file="shot-modal-shards.png" alt="Modal dashboard showing simulation shards running in parallel containers" />
                 ) : null}
                 {p.n === 3 ? (
                   <>
-                    <MediaSlot kind="screenshot" file="shot-modal-gpu.png" alt="Modal dashboard showing the L4 training container" caption="The training job on an L4." />
-                    <MediaSlot kind="screenshot" file="shot-modal-volume.png" alt="Modal volume browser showing runs and models" caption="Runs and models on the volume." />
+                    <MediaSlot kind="screenshot" file="shot-modal-gpu.png" alt="Modal dashboard showing the L4 training container" />
+                    <MediaSlot kind="screenshot" file="shot-modal-volume.png" alt="Modal volume browser showing runs and models" />
                   </>
                 ) : null}
-                {p.n === 4 ? <MediaSlot file="sketch-uncertainty.png" alt="Hand-drawn sketch of how the weak-cell search bins parameter space" caption="How the weak-cell search works, hand-drawn." /> : null}
+                {p.n === 4 ? <MediaSlot file="sketch-uncertainty.png" alt="Hand-drawn sketch of how the weak-cell search bins parameter space" /> : null}
                 <p className="kicker mt-5">What broke</p>
                 <div className="prose text-[0.95rem]">
                   <ul className="mt-2!">
@@ -245,8 +242,8 @@ export default function Page() {
               18,000 images rendered in about a minute of wall time, sharded across Modal containers.
             </p>
           </Prose>
-          <Figure src="/figures/dataset_distributions.png" alt="SNR and substructure residual distributions per class" caption="Signal-to-noise is matched across classes by construction. The substructure perturbs the arcs by two to three percent of peak brightness." />
-          <Figure src="/figures/sample_images.png" alt="A grid of sample images per class" caption="Six samples per class, square-root stretched." />
+          <Figure src="/figures/dataset_distributions.png" alt="SNR and substructure residual distributions per class" />
+          <Figure src="/figures/sample_images.png" alt="A grid of sample images per class" />
 
           <Sub>The classifier</Sub>
           <Prose>
@@ -267,7 +264,7 @@ export default function Page() {
           <Figure
             src="/figures/uncertainty_clf_base_b.png"
             alt="Bar chart of mean uncertainty per region of parameter space"
-            caption="Where the base classifier is weakest. The lightest axions produce vortex lines two to three arcseconds long; the same mass spread along a longer line perturbs the arcs less. Accuracy in that cell: 29%."
+           
           />
           <Sub>Explore it yourself</Sub>
           <Prose>
@@ -276,7 +273,7 @@ export default function Page() {
               most uncertain images in that cell.
             </p>
           </Prose>
-          <Embed src={embeds.explorer} title="Where is the classifier weak?" height={760} caption="Runs entirely in your browser; the first load takes a few seconds." />
+          <Embed src={embeds.explorer} title="Where is the classifier weak?" height={760} />
 
           <Sub>The loop, with a control</Sub>
           <Prose>
@@ -304,9 +301,9 @@ export default function Page() {
             </p>
           </Prose>
           <Table head={["Arm", "pass", "mean requests", "mean tokens", "mean time", "AUC reached per trial"]} rows={benchTable.map((r) => [r.arm, r.pass, r.req, r.tok, r.time, r.auc])} />
-          <Embed src={embeds.passk} title="pass@k" height={430} caption="How much three trials can tell you: move the sliders to see the estimators at other sample sizes." />
+          <Embed src={embeds.passk} title="pass@k" height={430} />
           <Figure src="/figures/bench_cost.png" alt="Bar charts of requests, tokens and wall time per arm" caption="Mean cost per trial. Kimi K3 completes the task either way; the tools change what it costs and whether the result is reproducible." />
-          <MediaSlot kind="screenshot" file="shot-bench-sandbox.png" alt="The core arm's sandbox directory full of scripts it wrote" caption="What the core arm left behind: its own simulator, trainer, and diagnostic scripts." />
+          <MediaSlot kind="screenshot" file="shot-bench-sandbox.png" alt="The core arm's sandbox directory full of scripts it wrote" />
           <Prose>
             <p>
               A strong model builds the whole pipeline from scratch and even reaches a higher AUC by engineering its own preprocessing: an
@@ -339,8 +336,7 @@ export default function Page() {
         {/* ------------------------------------------------------------ limits */}
         <Section id="limits" kicker="Limitations" title="Limitations">
           <Prose>
-            <p>The results above are real and reproducible. They are also early, and these are the caveats that matter.</p>
-            <ul>
+                        <ul>
               <li>
                 <strong>Three trials per arm.</strong> The pass@k estimators are exact for the sample, but the sample is small. Ten or more
                 trials and a second model are the obvious next benchmark.
@@ -402,7 +398,7 @@ export default function Page() {
         </Section>
       </main>
       <footer className="py-12">
-        <div className="mx-auto max-w-195 px-6 text-[0.82rem] text-muted">LensCraft · September 2026 · figures generated by the project&apos;s own report tool</div>
+        <div className="mx-auto max-w-195 px-6 text-[0.82rem] text-muted"></div>
       </footer>
     </>
   );

@@ -175,11 +175,11 @@ export const crossTable = [
 ];
 
 export const videos = [
-  { file: "agent-approve.mp4", title: "An agent session, approve path", caption: "A natural-language request becomes a LensCard, the run pauses for a y/n/e prompt, the batch executes on Modal, and the agent summarises the dataset." },
-  { file: "agent-edit-deny.mp4", title: "Edit and deny", caption: "Editing a field before approval, then denying a batch and watching the model explain itself instead of retrying." },
-  { file: "loop-modal.mp4", title: "One active-learning round", caption: "lenscraft loop with the Modal dashboard beside it: the uncertainty report, the proposed card, shards fanning out, the GPU job, the before/after metrics." },
-  { file: "benchmark.mp4", title: "Tool arm vs core arm", caption: "The tool arm finishes in two minutes; the core arm writes its own simulator and trainer from scratch in fifteen." },
-  { file: "report.mp4", title: "Generating the report", caption: "One command produces the markdown and figures used on this page." },
+  { file: "agent-approve.mp4", title: "An agent session, approve path", caption: "" },
+  { file: "agent-edit-deny.mp4", title: "Edit and deny", caption: "" },
+  { file: "loop-modal.mp4", title: "One active-learning round", caption: "" },
+  { file: "benchmark.mp4", title: "Tool arm vs core arm", caption: "" },
+  { file: "report.mp4", title: "Generating the report", caption: "" },
 ];
 
 export const reproduce = [
