@@ -1,32 +1,59 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { nav } from "@/content/site";
+import { outline } from "@/content/site";
 
-/* A fixed left rail of section ticks; the active one darkens as you scroll. No top bar. */
+/* A fixed left-hand outline, like a document table of contents: section titles at the first
+   level, subsections indented beneath them. The entry for what is on screen is darkened. */
 export function Rail() {
   const [active, setActive] = useState<string>("");
 
   useEffect(() => {
-    const sections = nav.map((n) => document.getElementById(n.id)).filter((el): el is HTMLElement => el !== null);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-35% 0px -55% 0px" },
-    );
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
+    const ids = outline.flatMap((o) => [o.id, ...(o.children ?? []).map((c) => c.id)]);
+    const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null);
+    const update = () => {
+      const line = window.innerHeight * 0.3;
+      let current = "";
+      for (const el of els) {
+        if (el.getBoundingClientRect().top <= line) current = el.id;
+      }
+      setActive(current);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
+  const cls = (id: string, sub = false) =>
+    `block leading-snug transition-colors hover:text-ink ${sub ? "text-[0.8rem]" : "text-[0.85rem]"} ${active === id ? "text-ink" : "text-muted"}`;
+
   return (
-    <nav aria-label="Sections" className="fixed left-8 top-1/2 z-10 hidden -translate-y-1/2 flex-col gap-1 lg:flex">
-      {nav.map((n) => (
-        <a key={n.id} href={`#${n.id}`} title={n.label} className="group flex h-2 items-center">
-          <span className={`block h-0.5 rounded-full transition-all ${active === n.id ? "w-4 bg-ink" : "w-3 bg-line group-hover:bg-muted"}`} />
-        </a>
-      ))}
+    <nav aria-label="Contents" className="fixed left-8 top-1/2 z-10 hidden w-44 -translate-y-1/2 xl:block">
+      <p className="text-[0.85rem] text-ink">Contents</p>
+      <ol className="mt-3 space-y-2">
+        {outline.map((o) => (
+          <li key={o.id}>
+            <a href={`#${o.id}`} className={cls(o.id)}>
+              {o.label}
+            </a>
+            {o.children ? (
+              <ol className="mt-1.5 space-y-1.5 pl-4">
+                {o.children.map((c) => (
+                  <li key={c.id}>
+                    <a href={`#${c.id}`} className={cls(c.id, true)}>
+                      {c.label}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            ) : null}
+          </li>
+        ))}
+      </ol>
     </nav>
   );
 }

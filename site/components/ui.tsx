@@ -13,8 +13,12 @@ export function Section({ id, title, children }: { id: string; kicker?: string; 
   );
 }
 
-export function Sub({ children }: { children: ReactNode }) {
-  return <h3 className="mt-12 text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">{children}</h3>;
+export function Sub({ id, children }: { id?: string; children: ReactNode }) {
+  return (
+    <h3 id={id} className="mt-12 scroll-mt-16 text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">
+      {children}
+    </h3>
+  );
 }
 
 export function Prose({ children }: { children: ReactNode }) {

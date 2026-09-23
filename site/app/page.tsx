@@ -99,7 +99,7 @@ export default function Page() {
           <div className="my-10">
             <LoopDiagram />
           </div>
-          <Sub>Try the simulator</Sub>
+          <Sub id="simulator">Try the simulator</Sub>
           <Prose>
             <p>
               The same engine the agent drives. Switch to the vortex class and slide the axion mass down: the vortex line stretches across
@@ -146,7 +146,7 @@ export default function Page() {
           <div className="my-10">
             <ArchitectureDiagram />
           </div>
-          <Sub>What flows through it</Sub>
+          <Sub id="data-flow">What flows through it</Sub>
           <Prose>
             <p>
               The agent never sees pixels. It reasons over one JSON record per image with cheap statistics computed at generation time,
@@ -157,7 +157,7 @@ export default function Page() {
           <div className="my-10">
             <DataFlowDiagram />
           </div>
-          <Sub>The approval gate</Sub>
+          <Sub id="approval">The approval gate</Sub>
           <Prose>
             <p>
               Simulation batches and training jobs cost money, so those tools require approval. Pydantic AI pauses the run and returns the
@@ -169,7 +169,7 @@ export default function Page() {
             <ApprovalDiagram />
           </div>
           <MediaSlot kind="screenshot" file="shot-terminal-approval.png" alt="Terminal screenshot of the approval prompt showing a proposed LensCard" />
-          <Sub>What a run card looks like</Sub>
+          <Sub id="run-card">What a run card looks like</Sub>
           <Code>{`{
   "n_images": 2000,
   "substructure": "vortex",
@@ -232,7 +232,7 @@ export default function Page() {
             </p>
           </Prose>
 
-          <Sub>The dataset</Sub>
+          <Sub id="dataset">The dataset</Sub>
           <Prose>
             <p>
               5,000 training and 1,000 test images per class at 64 pixels in a Euclid-like setup, plus the batches added by the loop.
@@ -242,7 +242,7 @@ export default function Page() {
           <Figure src="/figures/dataset_distributions.png" alt="SNR and substructure residual distributions per class" />
           <Figure src="/figures/sample_images.png" alt="A grid of sample images per class" />
 
-          <Sub>The classifier</Sub>
+          <Sub id="classifier">The classifier</Sub>
           <Prose>
             <p>
               ResNet-18 with a single-channel stem, trained from scratch for ten epochs on the 15,000 training images. It is essentially
@@ -263,7 +263,7 @@ export default function Page() {
             alt="Bar chart of mean uncertainty per region of parameter space"
            
           />
-          <Sub>Explore it yourself</Sub>
+          <Sub id="explorer">Explore it yourself</Sub>
           <Prose>
             <p>
               The same analysis, live on the 3,000 held-out scores. Pick a class and an axis, change the binning, and click a bar to see the
@@ -272,7 +272,7 @@ export default function Page() {
           </Prose>
           <Embed src={embeds.explorer} title="Where is the classifier weak?" height={760} />
 
-          <Sub>The loop, with a control</Sub>
+          <Sub id="loop">The loop, with a control</Sub>
           <Prose>
             <p>
               The agent simulated 2,000 more vortex images at the axion mass of the weakest cell and retrained under an identical recipe.
@@ -289,7 +289,7 @@ export default function Page() {
             </p>
           </Prose>
 
-          <Sub>Tools versus no tools</Sub>
+          <Sub id="benchmark">Tools versus no tools</Sub>
           <Prose>
             <p>
               Same model, same prompt, same sandbox. One arm has the domain tools; the other has only a shell and file tools, Python with
@@ -309,7 +309,7 @@ export default function Page() {
             </p>
           </Prose>
 
-          <Sub>Two engines, one answer</Sub>
+          <Sub id="cross-check">Two engines, one answer</Sub>
           <Prose>
             <p>
               The same lens systems rendered through PyAutoLens agree with the lenstronomy port to about one percent of peak brightness.
@@ -379,7 +379,7 @@ export default function Page() {
               </p>
             </Prose>
           </div>
-          <Sub>References</Sub>
+          <Sub id="references">References</Sub>
           <ol className="mt-4 divide-y divide-line border-t border-line">
             {Object.values(papers).map((p) => (
               <li key={p.href} className="py-3.5 text-[0.95rem] leading-relaxed">

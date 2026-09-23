@@ -15,18 +15,39 @@ export const papers = {
   deeplensesim: { title: "DeepLenseSim", authors: "Toomey", year: "GitHub", href: "https://github.com/mwt5345/DeepLenseSim" },
 };
 
-export const nav = [
+export type OutlineItem = { id: string; label: string; children?: { id: string; label: string }[] };
+export const outline: OutlineItem[] = [
   { id: "overview", label: "Overview" },
-  { id: "problem", label: "Problem" },
-  { id: "idea", label: "Idea" },
-  { id: "decisions", label: "Decisions" },
-  { id: "architecture", label: "Architecture" },
-  { id: "build", label: "Build" },
-  { id: "results", label: "Results" },
+  { id: "problem", label: "The problem" },
+  { id: "idea", label: "The idea", children: [{ id: "simulator", label: "Try the simulator" }] },
+  { id: "decisions", label: "Key decisions" },
+  {
+    id: "architecture",
+    label: "Architecture",
+    children: [
+      { id: "data-flow", label: "What flows through it" },
+      { id: "approval", label: "The approval gate" },
+      { id: "run-card", label: "The run card" },
+    ],
+  },
+  { id: "build", label: "The build" },
+  {
+    id: "results",
+    label: "Results",
+    children: [
+      { id: "dataset", label: "The dataset" },
+      { id: "classifier", label: "The classifier" },
+      { id: "explorer", label: "Explore it yourself" },
+      { id: "loop", label: "The loop, with a control" },
+      { id: "benchmark", label: "Tools versus no tools" },
+      { id: "cross-check", label: "Two engines, one answer" },
+    ],
+  },
   { id: "demos", label: "Demos" },
-  { id: "limits", label: "Limits" },
-  { id: "reproduce", label: "Reproduce" },
+  { id: "limits", label: "Limitations" },
+  { id: "reproduce", label: "Reproduce", children: [{ id: "references", label: "References" }] },
 ];
+export const nav = outline.map(({ id, label }) => ({ id, label }));
 
 export const stats = [
   { value: "0.93", label: "held-out accuracy", sub: "ResNet-18, 15k simulated images, 3 classes" },
