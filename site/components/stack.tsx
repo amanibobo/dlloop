@@ -1,57 +1,28 @@
-import * as si from "simple-icons";
+/* The tools and languages behind the project, as a row of plain text links. */
 
-/* The tools and languages behind the project, as a strip of icons in their brand colours,
-   with a small tooltip on hover. Icons are inlined from simple-icons at build time;
-   packages without a logo get a monogram badge in the same style. */
-
-type Item = { name: string; path?: string; hex?: string; mono?: string; href: string };
-
-const brand = (icon: { title: string; path: string; hex: string }, href: string): Item => ({ name: icon.title, path: icon.path, hex: `#${icon.hex}`, href });
-
-const STACK: Item[] = [
-  brand(si.siPython, "https://www.python.org/"),
-  brand(si.siPydantic, "https://ai.pydantic.dev/"),
-  { name: "Lenstronomy", mono: "Ln", hex: "#2a78d6", href: "https://github.com/lenstronomy/lenstronomy" },
-  { name: "PyAutoLens", mono: "AL", hex: "#1baf7a", href: "https://github.com/Jammy2211/PyAutoLens" },
-  brand(si.siNumpy, "https://numpy.org/"),
-  brand(si.siScipy, "https://scipy.org/"),
-  brand(si.siPytorch, "https://pytorch.org/"),
-  brand(si.siModal, "https://modal.com/"),
-  { name: "marimo", mono: "mo", hex: "#0ca30c", href: "https://marimo.io/" },
-  brand(si.siTypescript, "https://www.typescriptlang.org/"),
+const STACK: { name: string; href: string }[] = [
+  { name: "Python", href: "https://www.python.org/" },
+  { name: "Pydantic AI", href: "https://ai.pydantic.dev/" },
+  { name: "Lenstronomy", href: "https://github.com/lenstronomy/lenstronomy" },
+  { name: "PyAutoLens", href: "https://github.com/Jammy2211/PyAutoLens" },
+  { name: "NumPy", href: "https://numpy.org/" },
+  { name: "SciPy", href: "https://scipy.org/" },
+  { name: "PyTorch", href: "https://pytorch.org/" },
+  { name: "Modal", href: "https://modal.com/" },
+  { name: "marimo", href: "https://marimo.io/" },
+  { name: "TypeScript", href: "https://www.typescriptlang.org/" },
 ];
 
 export function Stack() {
   return (
     <div>
       <p className="kicker">Built with</p>
-      <ul className="mt-3 flex flex-wrap gap-2">
+      <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 text-[0.95rem]">
         {STACK.map((t) => (
-          <li key={t.name} className="group relative">
-            <a
-              href={t.href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={t.name}
-              className="flex h-11 w-11 items-center justify-center rounded-lg border border-line bg-white text-[var(--brand)] transition-colors hover:border-[var(--brand)] focus-visible:border-[var(--brand)] focus-visible:outline-none"
-              style={{ ["--brand" as string]: t.hex === "#000000" || t.hex === "#181717" ? "#111111" : t.hex }}
-            >
-              {t.path ? (
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden>
-                  <path d={t.path} />
-                </svg>
-              ) : (
-                <span className="font-mono text-[0.8rem] font-semibold tracking-tight" aria-hidden>
-                  {t.mono}
-                </span>
-              )}
-            </a>
-            <span
-              role="tooltip"
-              className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-[0.72rem] text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-            >
+          <li key={t.name}>
+            <a href={t.href} target="_blank" rel="noreferrer" className="text-ink-2 underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-ink">
               {t.name}
-            </span>
+            </a>
           </li>
         ))}
       </ul>
