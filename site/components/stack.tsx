@@ -15,17 +15,16 @@ const STACK: { name: string; href: string }[] = [
 
 export function Stack() {
   return (
-    <div>
-      <p className="kicker">Built with</p>
-      <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 text-[0.95rem]">
-        {STACK.map((t) => (
-          <li key={t.name}>
-            <a href={t.href} target="_blank" rel="noreferrer" className="text-ink-2 underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-ink">
-              {t.name}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <p className="text-[0.95rem] leading-relaxed text-ink-2">
+      Built with:{" "}
+      {STACK.map((t, i) => (
+        <span key={t.name}>
+          <a href={t.href} target="_blank" rel="noreferrer" className="underline decoration-line underline-offset-4 transition-colors hover:text-ink hover:decoration-ink">
+            {t.name}
+          </a>
+          {i < STACK.length - 1 ? ", " : ""}
+        </span>
+      ))}
+    </p>
   );
 }
