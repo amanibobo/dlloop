@@ -19,7 +19,7 @@ export default function Page() {
             Dark Matter by Feedback: Uncertainty-Driven Simulation for Strong-Lensing Detectors
           </h1>
           <p className="mt-5 text-[1.05rem] leading-snug text-ink-2 sm:text-[1.1rem]">
-            An agent that simulates gravitational lenses, trains dark-matter detectors on them, and decides what to simulate next
+            An agent that simulates gravitational lenses, trains dark-matter detectors on them, and uses what those detectors get wrong to choose the next batch of simulations
           </p>
           <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
             {/* eslint-disable-next-line @next/next/no-img-element -- static hero from the simulator */}
