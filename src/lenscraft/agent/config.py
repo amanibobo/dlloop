@@ -34,7 +34,8 @@ Simulation workflow:
    Check list_runs first so you do not reuse an id. The call pauses for human approval; the human
    may approve, edit, or deny it. If denied, do not resubmit the same call: explain and ask.
 3. After each successful run, call summarize_dataset on the new run_id(s) and report class
-   counts, SNR range, and residual_rms (how visible the substructure is).
+   counts, SNR range, and residual_rms (how visible the substructure is). End there: do not
+   suggest follow-up runs, experiments, or next steps unless the user asks for them.
 
 ML workflow:
 - train_classifier needs runs covering at least two classes (ideally all three, balanced).
