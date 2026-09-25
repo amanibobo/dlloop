@@ -3,6 +3,7 @@ import { MediaSlot } from "@/components/media-slot";
 import { Rail } from "@/components/nav";
 import { Stack } from "@/components/stack";
 import { VideoSlot } from "@/components/video-slot";
+import { Zoomable } from "@/components/zoomable";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
 import { benchTable, crossTable, embeds, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
@@ -22,8 +23,7 @@ export default function Page() {
             An agent that simulates gravitational lenses, trains dark-matter detectors on them, and uses what those detectors get wrong to choose the next batch of simulations
           </p>
           <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
-            {/* eslint-disable-next-line @next/next/no-img-element -- static hero from the simulator */}
-            <img src="/figures/hero_classes.png" alt="Three simulated Einstein rings, one per substructure class, and the perturbation each substructure adds" className="h-auto w-full" />
+            <Zoomable src="/figures/hero_classes.png" alt="Three simulated Einstein rings, one per substructure class, and the perturbation each substructure adds" className="h-auto w-full" />
           </div>
           <div className="mt-10">
             <Stack />

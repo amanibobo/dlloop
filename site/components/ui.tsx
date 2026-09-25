@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Zoomable } from "@/components/zoomable";
 
 /* Column: 780px, centred, generous vertical rhythm. Sections are typographic, not boxed. */
 
@@ -29,8 +30,7 @@ export function Figure({ src, alt, caption }: { src: string; alt: string; captio
   return (
     <figure className="my-8">
       <div className="overflow-hidden rounded-xl border border-line bg-white">
-        {/* eslint-disable-next-line @next/next/no-img-element -- static PNGs from the report generator */}
-        <img src={src} alt={alt} className="h-auto w-full" />
+        <Zoomable src={src} alt={alt} className="h-auto w-full" />
       </div>
       {caption ? <figcaption className="mt-3 text-center text-[0.85rem] leading-relaxed text-ink-2">{caption}</figcaption> : null}
     </figure>

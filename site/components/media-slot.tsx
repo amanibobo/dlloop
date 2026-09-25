@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Zoomable } from "@/components/zoomable";
 
 /* An image slot that renders `/media/<file>` when it exists and a quiet placeholder otherwise.
    Used for hand-drawn (tldraw) diagrams and screenshots the author adds after the fact. */
@@ -40,8 +41,7 @@ export function MediaSlot({ file, alt, caption, kind = "sketch" }: { file: strin
   return (
     <figure className="my-8">
       <div className={kind === "screenshot" ? "overflow-hidden rounded-xl border border-line bg-white" : ""}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- author-supplied static image */}
-        <img src={src} alt={alt} className="h-auto w-full" />
+        <Zoomable src={src} alt={alt} className="h-auto w-full" />
       </div>
       {caption ? <figcaption className="mt-3 text-center text-[0.85rem] leading-relaxed text-ink-2">{caption}</figcaption> : null}
     </figure>
