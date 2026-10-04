@@ -39,7 +39,7 @@ export default function Page() {
             </p>
             <p>
               It was built in six phases over a week on Pydantic AI, Lenstronomy and Modal, with the machine-learning architectures ported
-              from two papers by the same research group. Every phase was tested and verified with a real run before the next one started.
+              from two papers by the same research group.
             </p>
           </Prose>
           <div className="mt-10">
@@ -311,9 +311,6 @@ export default function Page() {
 
         {/* ------------------------------------------------------------- demos */}
         <Section id="demos" kicker="Demos" title="See it run">
-          <Prose>
-            <p>Short recordings of the product, each under two minutes.</p>
-          </Prose>
           {videos.map((v) => (
             <VideoSlot key={v.file} {...v} />
           ))}
@@ -347,7 +344,7 @@ export default function Page() {
         {/* --------------------------------------------------------- reproduce */}
         <Section id="reproduce" kicker="Reproduce" title="Clone to trained model in five commands">
           <Prose>
-            <p>Everything on this page came from the repository, a Modal account, and an LLM key.</p>
+            <p>Everything on this page came from the repository.</p>
           </Prose>
           <ol className="mt-8 grid gap-5">
             {reproduce.map((r) => (
