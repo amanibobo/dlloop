@@ -74,7 +74,7 @@ export const decisions: Decision[] = [
     question: "Should the images go in a vector database?",
     options: "Pinecone · object storage · the Modal Volume",
     chosen: "The Modal Volume",
-    why: "A vector database stores embeddings for similarity search; it cannot hold float32 image arrays. The volume mounts straight into the GPU containers where training reads it.",
+    why: "A vector database cannot hold image arrays. The volume mounts straight into the GPU containers where training reads it.",
   },
   {
     question: "Which LLM drives the agent?",
