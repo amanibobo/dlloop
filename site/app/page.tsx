@@ -1,9 +1,9 @@
 import { Embed } from "@/components/embed";
+import { LensAnimation } from "@/components/lens-animation";
 import { MediaSlot } from "@/components/media-slot";
 import { Rail } from "@/components/nav";
 import { Stack } from "@/components/stack";
 import { VideoSlot } from "@/components/video-slot";
-import { Zoomable } from "@/components/zoomable";
 import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
 import { benchTable, crossTable, embeds, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
@@ -22,8 +22,8 @@ export default function Page() {
           <p className="mt-5 text-[1.05rem] leading-snug text-ink-2 sm:text-[1.1rem]">
             An agent that simulates gravitational lenses, trains dark-matter detectors on them, and uses what those detectors get wrong to choose the next batch of simulations
           </p>
-          <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
-            <Zoomable src="/figures/hero_classes.png" alt="Three simulated Einstein rings, one per substructure class, and the perturbation each substructure adds" className="h-auto w-full" />
+          <div className="mt-8">
+            <LensAnimation />
           </div>
           <div className="mt-10">
             <Stack />
