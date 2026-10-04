@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function VideoSlot({ file, title, caption }: { file: string; title: string; caption: string }) {
   const [state, setState] = useState<"checking" | "ready" | "missing">("checking");
+  const ref = useRef<HTMLVideoElement>(null);
   const src = `/videos/${file}`;
 
   useEffect(() => {
@@ -21,11 +22,26 @@ export function VideoSlot({ file, title, caption }: { file: string; title: strin
     };
   }, [src]);
 
+  // play while on screen, pause when scrolled away (autoplay needs muted, and these are silent)
+  useEffect(() => {
+    const el = ref.current;
+    if (state !== "ready" || !el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) el.play().catch(() => {});
+        else el.pause();
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [state]);
+
   return (
     <figure className="my-10">
       <div className={`relative overflow-hidden rounded-xl border border-line bg-surface ${state === "ready" ? "" : "aspect-video"}`}>
         {state === "ready" ? (
-          <video className="block h-auto w-full" controls preload="metadata" playsInline src={src} onError={() => setState("missing")} />
+          <video ref={ref} className="block h-auto w-full" controls muted loop playsInline preload="metadata" src={src} onError={() => setState("missing")} />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-1.5 p-6 text-center">
             <span className="kicker">{state === "checking" ? "Loading" : "Recording coming soon"}</span>
