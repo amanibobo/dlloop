@@ -23,9 +23,9 @@ export function VideoSlot({ file, title, caption }: { file: string; title: strin
 
   return (
     <figure className="my-10">
-      <div className="relative aspect-video overflow-hidden rounded-xl border border-line bg-surface">
+      <div className={`relative overflow-hidden rounded-xl border border-line bg-surface ${state === "ready" ? "" : "aspect-video"}`}>
         {state === "ready" ? (
-          <video className="h-full w-full bg-black" controls preload="metadata" playsInline src={src} onError={() => setState("missing")} />
+          <video className="block h-auto w-full" controls preload="metadata" playsInline src={src} onError={() => setState("missing")} />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-1.5 p-6 text-center">
             <span className="kicker">{state === "checking" ? "Loading" : "Recording coming soon"}</span>
