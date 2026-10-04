@@ -118,7 +118,7 @@ export default function Page() {
               function drives the terminal prompt, the benchmark&apos;s auto-approver, and the loop driver.
             </p>
             <p>
-              Compute and data went to Modal rather than a rented VM or the laptop, which had 300 MB free the day the project started. The
+              Compute and data went to Modal rather than a rented VM or the laptop. The
               pipeline is function-shaped, so each tool became a remote function behind the same submit-and-status interface as the local
               backend; batches shard across containers and training gets an L4 on demand. The images live on a Modal volume that mounts
               straight into the GPU containers, after a brief detour considering a vector database, which stores embeddings and cannot hold

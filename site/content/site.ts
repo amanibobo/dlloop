@@ -68,7 +68,7 @@ export const decisions: Decision[] = [
     question: "Where does the compute and data live?",
     options: "Laptop · RunPod or Lambda VMs · Modal",
     chosen: "Modal functions and a Modal Volume",
-    why: "The pipeline is function-shaped, so each tool became a remote function behind the same submit/status interface as the local backend. Batches shard across containers, training gets an L4 on demand, and nothing large ever touches the laptop, which had 300 MB free the day the project started.",
+    why: "The pipeline is function-shaped, so each tool became a remote function behind the same submit/status interface as the local backend. Batches shard across containers, training gets an L4 on demand, and nothing large ever touches the laptop.",
   },
   {
     question: "Should the images go in a vector database?",
