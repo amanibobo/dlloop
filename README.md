@@ -1,7 +1,82 @@
 # LensCraft
 
-Agentic strong-gravitational-lensing simulation pipeline. See [DESIGN.md](DESIGN.md) for the full
-design. This README tracks what is actually built.
+**Dark Matter by Feedback: Uncertainty-Driven Simulation for Strong-Lensing Detectors**
+
+<p align="center">
+  <img src="docs/assets/lensing-loop.gif" width="760" alt="Light from a distant galaxy bends around a galaxy cluster on its way to Earth">
+</p>
+
+An agent that simulates gravitational lenses, trains dark-matter substructure detectors on them,
+and uses what those detectors get wrong to choose the next batch of simulations. A human approves
+every batch before it runs. See [DESIGN.md](DESIGN.md) for the original design and the
+[case-study site](site/) for the full write-up; this README tracks what is actually built.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    classDef human fill:#b2f2bb,stroke:#1e1e1e,color:#1e1e1e
+    classDef agent fill:#d0bfff,stroke:#1e1e1e,color:#1e1e1e
+    classDef gated fill:#ffd8a8,stroke:#c92a2a,stroke-width:2px,color:#1e1e1e
+    classDef free  fill:#ffec99,stroke:#1e1e1e,color:#1e1e1e
+    classDef infra fill:#e9ecef,stroke:#1e1e1e,color:#1e1e1e
+    classDef data  fill:#a5d8ff,stroke:#1e1e1e,color:#1e1e1e
+
+    user([You<br/><i>terminal</i>]):::human
+
+    subgraph AGENT["lenscraft/agent"]
+        direction TB
+        llm[Pydantic AI agent<br/><i>any LLM provider</i>]:::agent
+        gate{approve?<br/><i>y / e / n</i>}:::human
+        sim[simulate_lens_batch]:::gated
+        train[train_classifier<br/>train_anomaly_detector]:::gated
+        unc[sample_uncertainty]:::free
+        misc[evaluate · summarize<br/>cross-check · report]:::free
+    end
+
+    subgraph COMPUTE["lenscraft/compute"]
+        direction TB
+        be[ComputeBackend<br/><i>submit · status · wait</i>]:::infra
+        local[local<br/><i>laptop</i>]:::infra
+        subgraph MODAL["Modal"]
+            direction TB
+            shards[simulate_shard ×N]:::infra
+            gpu[train / evaluate<br/><i>L4 GPU</i>]:::infra
+            vol[(volume<br/>runs · models · scores)]:::data
+        end
+    end
+
+    subgraph DOMAIN["domain code"]
+        direction TB
+        lenst[lenscraft/sim<br/><i>Lenstronomy, PyAutoLens</i>]:::data
+        ml[lenscraft/ml + models<br/><i>ResNet-18 · AAE · uncertainty</i>]:::data
+    end
+
+    user <-->|ask / answer| llm
+    llm -->|wants a gated tool| gate
+    gate -.->|shows the LensCard| user
+    gate -->|approved| sim & train
+    llm --> unc & misc
+    sim & train & unc & misc --> be
+    be --> local & MODAL
+    shards & gpu <--> vol
+    local & shards --> lenst
+    local & gpu --> ml
+    unc -->|proposes the next LensCard| gate
+```
+
+Everything the agent exchanges is a Pydantic model from `lenscraft/schema`: `LensCard` (the run
+card a human approves), `lensjsonl` (one record per image, with cheap statistics instead of
+pixels), `TrainSpec`, and `UncertaintyReport`. `lenscraft/bench` and `lenscraft/report` sit beside
+the agent and drive it: the benchmark runs the same model with and without these tools, the
+report turns runs and models into figures.
+
+The loop the whole project exists for: the agent simulates, trains, evaluates on held-out
+images, finds the region of `LensCard` space where the model is weakest, and proposes a new
+card targeting it. Only approved cards reach the simulator. Every tool talks to
+`ComputeBackend`, so `--backend local|modal` moves the pipeline between the laptop and Modal
+without touching agent code. The agent never sees pixels: it reasons over `lensjsonl` records
+and per-image scores.
 
 ## Status
 
