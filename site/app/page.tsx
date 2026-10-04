@@ -4,7 +4,6 @@ import { MediaSlot } from "@/components/media-slot";
 import { Rail } from "@/components/nav";
 import { Stack } from "@/components/stack";
 import { VideoSlot } from "@/components/video-slot";
-import { ApprovalDiagram, ArchitectureDiagram, DataFlowDiagram, LoopDiagram } from "@/components/diagrams";
 import { ClassDot, Code, Figure, Meta, Prose, Section, Sub, Table } from "@/components/ui";
 import { benchTable, crossTable, embeds, loopTable, papers, phases, REPO, reproduce, videos } from "@/content/site";
 
@@ -96,9 +95,6 @@ export default function Page() {
             </p>
           </Prose>
           <MediaSlot file="sketch-loop.png" alt="Hand-drawn sketch of the simulate, train, find-weak-region loop" />
-          <div className="my-10">
-            <LoopDiagram />
-          </div>
           <Sub id="simulator">Try the simulator</Sub>
           <Prose>
             <p>
@@ -143,9 +139,6 @@ export default function Page() {
             </p>
           </Prose>
           <MediaSlot file="sketch-architecture.png" alt="Hand-drawn sketch of the agent, tool tiers, compute backend and Modal volume" />
-          <div className="my-10">
-            <ArchitectureDiagram />
-          </div>
           <Sub id="data-flow">What flows through it</Sub>
           <Prose>
             <p>
@@ -154,9 +147,7 @@ export default function Page() {
               rather than another model.
             </p>
           </Prose>
-          <div className="my-10">
-            <DataFlowDiagram />
-          </div>
+          <MediaSlot file="sketch-dataflow.png" alt="Hand-drawn sketch of the data flowing from LensCard to lensjsonl to checkpoint to scores to the next card" />
           <Sub id="approval">The approval gate</Sub>
           <Prose>
             <p>
@@ -165,9 +156,7 @@ export default function Page() {
               auto-approver used by benchmarks, and the loop driver.
             </p>
           </Prose>
-          <div className="my-10">
-            <ApprovalDiagram />
-          </div>
+          <MediaSlot file="sketch-approval.png" alt="Hand-drawn sketch of the approval gate: the run pauses, the human answers y, e or n, the run resumes" />
           <MediaSlot kind="screenshot" file="shot-terminal-approval.png" alt="Terminal screenshot of the approval prompt showing a proposed LensCard" />
           <Sub id="run-card">What a run card looks like</Sub>
           <Code>{`{

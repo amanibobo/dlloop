@@ -260,3 +260,61 @@ function write(name, sk) {
   sk.arrow(card.cx, card.b + 8, after.cx, after.y - 8, { label: "human approves, 2k images", labelDx: 100, labelDy: 0 });
   write("sketch-uncertainty", sk);
 }
+
+/* ============================================================ 5. what flows through it */
+{
+  const sk = new Sketch(1250, 440);
+  const steps = [
+    ["LensCard", "class, mass, seed", FILL.blue],
+    ["lensjsonl", "one record per image:\nlabel, SNR, residual", FILL.teal],
+    ["checkpoint", "best-val epoch", FILL.orange],
+    ["scores", "P(class) per image", FILL.violet],
+    ["uncertainty", "weakest cell\n-> next card", FILL.yellow],
+  ];
+  const boxes = steps.map(([label, sub, fill], i) => {
+    const x = 40 + i * 250;
+    const b = sk.rect(x, 90, 170, 110, { fill, label, size: 19 });
+    sub.split("\n").forEach((l, j) => sk.text(b.cx, b.cy + 16 + j * 17, l, { size: 12, color: MUTED }));
+    return b;
+  });
+  const verbs = ["simulate", "train", "evaluate", "bin + rank"];
+  boxes.slice(0, -1).forEach((b, i) => sk.arrow(b.r + 6, b.cy, boxes[i + 1].x - 6, boxes[i + 1].cy, { label: verbs[i], labelDy: -12 }));
+  // return path drawn as three straight segments under the row, so it never crosses a box
+  const last = boxes[boxes.length - 1], first = boxes[0], yb = 300;
+  const o = opts({ seed: 501 });
+  sk.parts.push(ops(gen.linearPath([[last.cx, last.b + 6], [last.cx, yb], [first.cx, yb]], o)));
+  sk.arrow(first.cx, yb, first.cx, first.b + 8);
+  sk.text(625, yb + 20, "closes the loop: the human approves the proposed card, then it is simulated", { size: 13, color: MUTED });
+  sk.text(625, 40, "what flows through it", { size: 20 });
+  // tiny image strip under lensjsonl to show what the records point at
+  [0, 1, 2].forEach((i) => sk.tinyImage(boxes[1].x + 20 + i * 46, 216, 32, { blob: i === 2 }));
+  sk.note(boxes[1].x + 160, 232, ".npy files, on the volume", { size: 11 });
+  sk.note(40, 400, "the agent only ever reads the JSON on this line, never the image pixels", { size: 13 });
+  write("sketch-dataflow", sk);
+}
+
+/* ============================================================ 6. the approval gate */
+{
+  const sk = new Sketch(1150, 560);
+  const prop = sk.rect(40, 60, 210, 90, { fill: FILL.violet, label: "model proposes", sub: "simulate_lens_batch(card)" });
+  const pause = sk.rect(300, 60, 220, 90, { fill: FILL.grey, label: "run pauses", sub: "DeferredToolRequests", dashed: true });
+  const gate = sk.diamond(820, 105, 220, 110, { fill: FILL.green, label: "human", sub: "reads the card" });
+  sk.arrow(prop.r + 8, prop.cy, pause.x - 8, pause.cy);
+  sk.arrow(pause.r + 8, pause.cy, gate.x - 8, gate.cy, { label: "shown in the terminal", labelDy: -14 });
+
+  // three outcomes fan out below the diamond
+  const y = 330;
+  const yes = sk.rect(40, y, 230, 100, { fill: FILL.blue, label: "y  approve", sub: "tool runs as proposed", size: 18 });
+  const edit = sk.rect(330, y, 260, 100, { fill: FILL.yellow, label: "e  edit", sub: "change fields, then run", size: 18 });
+  const no = sk.rect(650, y, 260, 100, { fill: FILL.red, label: "n  deny", sub: "model reads the reason, no retry", size: 18 });
+  sk.arrow(gate.cx - 40, gate.b + 4, yes.cx, yes.y - 8, { curve: 40, color: "#2b8a3e" });
+  sk.arrow(gate.cx - 10, gate.b + 6, edit.cx, edit.y - 8, { color: "#e67700" });
+  sk.arrow(gate.cx + 20, gate.b + 6, no.cx, no.y - 8, { color: "#c92a2a" });
+  sk.text(edit.cx, edit.b + 26, "e.g.  n_images=40 substructure=subhalo", { size: 12, color: MUTED });
+
+  const resume = sk.rect(960, 330, 170, 100, { fill: FILL.grey, label: "run resumes", sub: "DeferredToolResults", size: 15, dashed: true });
+  sk.arrow(no.r + 8, no.cy, resume.x - 8, resume.cy, { dashed: true });
+  sk.text(resume.cx, resume.b + 26, "whatever the answer", { size: 12, color: MUTED });
+  sk.note(40, 510, "one callback, three callers: the terminal prompt, the benchmark's auto-approver, and the loop driver", { size: 12 });
+  write("sketch-approval", sk);
+}
