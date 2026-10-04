@@ -33,7 +33,7 @@ export default function Page() {
         <Section id="overview" kicker="Overview" title="Closing the loop between simulation and learning">
           <Prose>
             <p>
-              LensCraft is an agent that plans and runs strong gravitational lensing simulation batches, trains classifiers and anomaly
+              DeepLenseLoop is an agent that plans and runs strong gravitational lensing simulation batches, trains classifiers and anomaly
               detectors on the results, and uses what those models are uncertain about to decide what to simulate next. A human approves
               every batch before it runs.
             </p>
